@@ -1,12 +1,30 @@
+// import { createRoot } from 'react-dom/client'
+// import './index.css'
+// import App from './App.jsx'
+// import { BrowserRouter } from 'react-router-dom'
+// import React from 'react'
+
+// createRoot(document.getElementById('root')).render(
+//      <React.StrictMode>
+//     <App />
+//     </React.StrictMode>
+    
+// )
+
+
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
+import { AppProvider } from './contexts/AppContext.jsx' // path-i yoxla
 import React from 'react'
 
 createRoot(document.getElementById('root')).render(
-     <React.StrictMode>
-    <App />
-    </React.StrictMode>
-    
+  <React.StrictMode>
+
+      <AppProvider>
+        <App />
+      </AppProvider>
+  
+  </React.StrictMode>
 )
