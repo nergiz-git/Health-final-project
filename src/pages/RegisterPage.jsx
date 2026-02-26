@@ -1,11 +1,12 @@
+
+
+
 import medicalBg from "../assets/images/medicalBg.png";
-import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
-import { CheckCircle, Heart, HeartPulse, Ruler, Weight, Loader2 } from 'lucide-react';
+import { CheckCircle, Heart, Ruler, Weight } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function RegisterPage({ onSwitchToLogin }) {
   const [fullName, setFullName] = useState('');
@@ -21,16 +22,16 @@ function RegisterPage({ onSwitchToLogin }) {
   const [severity, setSeverity] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const navigate = useNavigate();
   const [showPasswordRules, setShowPasswordRules] = useState(false);
   const [passwordValid, setPasswordValid] = useState(false);
   const [otp, setOtp] = useState('');
   const [verificationId, setVerificationId] = useState(null);
   const [verificationToken, setVerificationToken] = useState(null);
   const [otpSent, setOtpSent] = useState(false);
-  const [resendAvailableAt, setResendAvailableAt] = useState(null);
   const [otpLoading, setOtpLoading] = useState(false);
-  // const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+
   const healthConditionCategories = [
     'Ürək–damar sistemi', 'Tənəffüs sistemi', 'Endokrin və maddələr mübadiləsi',
     'Sinir sistemi', 'Əzələ–skelet sistemi', 'Həzm sistemi (mədə–bağırsaq)',
@@ -56,78 +57,19 @@ function RegisterPage({ onSwitchToLogin }) {
     const hasUpper = /[A-Z]/.test(value);
     const hasNumber = /[0-9]/.test(value);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-    const [verificationToken, setVerificationToken] = useState(null);
-    const [verificationSent, setVerificationSent] = useState(false);
     const isValid = hasLength && hasUpper && hasNumber && hasSpecial;
-
     setPasswordValid(isValid);
-
-
     if (isValid) setShowPasswordRules(false);
   };
 
   const getAvailableConditions = () => conditionCategory ? conditionsByCategory[conditionCategory] || [] : [];
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (password !== confirmPassword) {
-  //     alert("Şifrələr eyni deyil!");
-  //     return;
-  //   }
 
-  //   // 🔴 Şifrə qaydalara uyğun deyilsə stop
-  //   if (!passwordValid) {
-  //     alert("Şifrə tələblərə uyğun deyil!");
-  //     return;
-  //   }
-
-  //   const payload = {
-  //     fullName,
-  //     email,
-  //     password,
-  //     dateOfBirth,
-
-  //     gender: gender.toLowerCase(),
-  //     height: Number(height),
-  //     weight: Number(weight),
-  //     conditionId: 1,
-  //     severity: "mild"
-  //   };
-
-  //   try {
-  //     const res = await fetch(`${API_BASE_URL}/auth/register`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(payload)
-  //     });
-
-  //     const data = await res.json();
-
-  //     if (!res.ok) {
-  //       throw new Error(data.message || "Qeydiyyat uğursuz oldu");
-  //     }
-
-  //     console.log("REGISTER SUCCESS:", data);
-
-  //     navigate("/login");
-  //   } catch (err) {
-  //     console.error("REGISTER ERROR:", err);
-  //     alert(err.message);
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!verificationToken) {
-      return alert("Zəhmət olmasa OTP ilə emailinizi təsdiqləyin");
-    }
-
-    if (password !== confirmPassword) {
-      return alert("Şifrələr eyni deyil!");
-    }
-
-    if (!passwordValid) {
-      return alert("Şifrə tələblərə uyğun deyil!");
-    }
+    if (password !== confirmPassword) return alert("Şifrələr eyni deyil!");
+    if (!passwordValid) return alert("Şifrə tələblərə uyğun deyil!");
+    if (!verificationToken) return alert("Zəhmət olmasa OTP ilə emailinizi təsdiqləyin");
 
     const payload = {
       fullName,
@@ -148,41 +90,30 @@ function RegisterPage({ onSwitchToLogin }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || "Qeydiyyat uğursuz oldu");
-
       alert("Qeydiyyat uğurla tamamlandı!");
       navigate("/login");
-
     } catch (err) {
       console.error(err);
       alert(err.message);
     }
   };
+
   const sendOtp = async () => {
     if (!email) return alert("Zəhmət olmasa email daxil edin");
-
     setOtpLoading(true);
-
     try {
       const res = await fetch(`${API_BASE_URL}/auth/email/otp/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
-
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || "OTP göndərmə uğursuz oldu");
-
       setVerificationId(data.verificationId);
-      setResendAvailableAt(new Date(data.resendAvailableAt));
       setOtpSent(true);
-
       alert("OTP göndərildi. Emailinizi yoxlayın!");
-
     } catch (err) {
       console.error(err);
       alert(err.message);
@@ -190,88 +121,42 @@ function RegisterPage({ onSwitchToLogin }) {
       setOtpLoading(false);
     }
   };
+
   const verifyOtp = async () => {
     if (!otp || !verificationId) return alert("OTP daxil edin");
-
     try {
       const res = await fetch(`${API_BASE_URL}/auth/email/otp/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ verificationId, otp })
       });
-
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.message || "OTP təsdiqi uğursuz oldu");
-
       setVerificationToken(data.verificationToken);
       alert("Email təsdiqləndi! İndi qeydiyyatı tamamlayın.");
-
     } catch (err) {
       console.error(err);
       alert(err.message);
     }
   };
 
-  //  if (loading) {
-  //   return (
-  //     <div className="flex items-center justify-center h-96">
-  //       <div className="text-center">
-  //         <Loader2 className="w-8 h-8 animate-spin text-purple-600 mx-auto mb-2" />
-  //         <p className="text-slate-600">Yüklənir...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-teal-50">
       <style>{`
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-60px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-  to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .animate-slide-in-left {
-    animation: slideInLeft 0.7s ease-out forwards;
-    opacity: 0;
-  }
-  
-  .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out forwards;
-    opacity: 0;
-  }
-`}</style>
+        @keyframes slideInLeft { from { opacity: 0; transform: translateX(-60px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slide-in-left { animation: slideInLeft 0.7s ease-out forwards; opacity: 0; }
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
+      `}</style>
 
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-30"
-        style={{ backgroundImage: `url(${medicalBg})` }}
-      />
+      <div className="absolute inset-0 bg-cover bg-center opacity-30" style={{ backgroundImage: `url(${medicalBg})` }} />
       <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/80 to-teal-50/60 backdrop-blur-[2px]" />
-
 
       <div className="relative z-10 grid lg:grid-cols-2 min-h-screen px-6 lg:px-16 py-10 items-center gap-12">
 
-
+        {/* Left Side Content */}
         <div className="hidden lg:flex flex-col justify-center space-y-12">
-
-
+          {/* Logo & Title */}
           <div className="flex items-center gap-3 animate-slide-in-left" style={{ animationDelay: '0.1s' }}>
             <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-3xl">H</span>
@@ -279,7 +164,7 @@ function RegisterPage({ onSwitchToLogin }) {
             <span className="font-bold text-3xl text-slate-800">Health Assistant</span>
           </div>
 
-
+          {/* Hero */}
           <div className="animate-slide-in-left" style={{ animationDelay: '0.25s' }}>
             <h1 className="!text-4xl font-bold leading-tight text-slate-900">
               Səyahətinizə Başlayın
@@ -292,8 +177,6 @@ function RegisterPage({ onSwitchToLogin }) {
               Xroniki xəstəliklərini effektiv şəkildə idarə etmək üçün HealthAssist-ə etibar edən minlərlə istifadəçiyə qoşulun.
             </p>
           </div>
-
-
           <div className="grid grid-cols-2 gap-5 animate-slide-in-left" style={{ animationDelay: '0.4s' }}>
             <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-md border border-slate-100">
               <p className="text-2xl font-bold bg-gradient-to-br from-teal-600 to-cyan-500 bg-clip-text text-transparent">50K+</p>
@@ -304,18 +187,18 @@ function RegisterPage({ onSwitchToLogin }) {
               <p className="text-slate-600 mt-1">Məmnuniyyət Dərəcəsi</p>
             </div>
             <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-md border border-slate-100">
-              <p className="text-2xl font-bold bg-gradient-to-br from-teal-600 to-cyan-500 bg-clip-text text-transparent">24/7</p>
-              <p className="text-slate-600 mt-1">Dəstək Mövcuddur</p>
-            </div>
-            <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-md border border-slate-100">
+               <p className="text-2xl font-bold bg-gradient-to-br from-teal-600 to-cyan-500 bg-clip-text text-transparent">24/7</p>
+               <p className="text-slate-600 mt-1">Dəstək Mövcuddur</p>
+           </div>
+           <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-md border border-slate-100">
               <p className="text-2xl font-bold bg-gradient-to-br from-teal-600 to-cyan-500 bg-clip-text text-transparent">100%</p>
               <p className="text-slate-600 mt-1">Təhlükəsiz və Məxfi</p>
             </div>
-          </div>
+           </div>
 
 
           <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-6 rounded-2xl border border-teal-100 shadow-sm animate-slide-in-left" style={{ animationDelay: '0.55s' }}>
-            <p className="text-slate-700 italic leading-relaxed">
+             <p className="text-slate-700 italic leading-relaxed">
               "HealthAssist diabetimi idarə etmə üsulumu tamamilə dəyişdi. Dərman xatırlatmaları və qidalanma planlaması funksiyaları inanılmaz dərəcədə faydalıdır!"
             </p>
             <div className="flex items-center gap-3 mt-4">
@@ -324,25 +207,22 @@ function RegisterPage({ onSwitchToLogin }) {
               </div>
               <div>
                 <p className="font-semibold text-slate-800">Mikayıl Cəfərov</p>
-                <p className="text-sm text-slate-500">Tip 2 Diabet Xəstəsi</p>
-              </div>
+               <p className="text-sm text-slate-500">Tip 2 Diabet Xəstəsi</p>
             </div>
-          </div>
-        </div>
+            </div>
+          </div> 
+              </div>
 
-
-        <div className="w-full max-w-[550px] mx-auto animate-fade-in-up overflow-auto max-h-screen lg:overflow-visible lg:max-h-full pb-10 scrollbar-none" style={{ animationDelay: '0.2s' }}>
+        {/* Right Side Form */}
+        <div className="w-full max-w-[550px] mx-auto animate-fade-in-up overflow-auto max-h-screen lg:overflow-visible lg:max-h-full pb-10" style={{ animationDelay: '0.2s' }}>
           <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 p-8 lg:p-10">
-
-
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-slate-900">Hesab Yaradın</h2>
               <p className="text-slate-600 mt-2">Bu gün sağlamlıq səyahətinizə başlayın</p>
             </div>
 
-
             <form onSubmit={handleSubmit} className="space-y-5">
-
+              {/* Tam Ad */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Tam Ad</label>
                 <div className="relative">
@@ -356,12 +236,13 @@ function RegisterPage({ onSwitchToLogin }) {
                     placeholder="John Doe"
                     value={fullName}
                     onChange={e => setFullName(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-[#F3F3F5] text-slate-500"
+                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition-all bg-[#F3F3F5] text-slate-500"
                     required
                   />
                 </div>
               </div>
 
+              {/* Email & OTP */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Email Ünvanı</label>
                 <div className="relative">
@@ -375,16 +256,17 @@ function RegisterPage({ onSwitchToLogin }) {
                     placeholder="sizin.email@gmail.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-[#F3F3F5] text-slate-500"
+                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 outline-none transition-all bg-[#F3F3F5] text-slate-500"
                     required
                   />
                 </div>
+
                 {!otpSent && (
                   <button
                     type="button"
                     onClick={sendOtp}
                     disabled={otpLoading || !email}
-                    className="w-full !bg-[#F3F3F5] !text-black py-2 rounded-lg mt-2 !cursor-pointer"
+                    className="w-full bg-[#F3F3F5] text-black py-2 rounded-lg mt-2"
                   >
                     {otpLoading ? "Göndərilir..." : "OTP Göndər"}
                   </button>
@@ -402,7 +284,7 @@ function RegisterPage({ onSwitchToLogin }) {
                     <button
                       type="button"
                       onClick={verifyOtp}
-                      className="w-full !bg-[#F3F3F5] !text-black py-2 rounded-lg mt-2 !cursor-pointer"
+                      className="w-full bg-[#F3F3F5] text-black py-2 rounded-lg mt-2"
                     >
                       OTP Təsdiqlə
                     </button>
@@ -410,16 +292,15 @@ function RegisterPage({ onSwitchToLogin }) {
                 )}
               </div>
 
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Doğum Tarixi</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <input
+                 <div>
+             <label className="block text-sm font-medium text-slate-700 mb-2">Doğum Tarixi</label>
+             <div className="relative">
+               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                 <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                 </svg>
+               </div>
+               <input
                     type="date"
                     value={dateOfBirth}
                     onChange={e => setDateOfBirth(e.target.value)}
@@ -727,7 +608,6 @@ function RegisterPage({ onSwitchToLogin }) {
             </form>
           </div>
         </div>
-
       </div>
     </div>
   );
