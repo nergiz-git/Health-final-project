@@ -28,7 +28,7 @@ import { Button } from "../ui/Button";
       {medications.map((med) => (
         <div key={med.id} className="flex justify-between p-3 border rounded-lg mb-2">
           <div>
-            <p className="font-semibold">{med.name}</p>
+            <p className="font-semibold ">{med.name}</p>
             <p className="text-sm text-gray-500">{med.time}</p>
           </div>
 

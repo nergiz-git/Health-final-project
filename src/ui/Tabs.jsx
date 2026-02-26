@@ -29,7 +29,7 @@ export function TabsTrigger({ children, value }) {
   return (
     <button
       onClick={() => changeTab(value)}
-      className={`!px-2 !py-1 rounded-lg text-sm ${
+      className={`!px-2 !py-1 rounded-lg text-sm text-slate-400 ${
         isActive ? "!bg-white text-purple-500" : "!bg-gray-100"
       }`}
     >

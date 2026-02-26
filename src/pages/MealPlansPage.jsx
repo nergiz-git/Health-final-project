@@ -42,8 +42,9 @@ const [shoppingList, setShoppingList] = useState({});
     updateMealPlan(day, meal);
   };
 
+  
   return (
-    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 relative">
+    <div className="max-w-[1600px] mx-auto px-0 sm:px-0 lg:px-0 py-6 sm:py-10 relative">
       <div className="relative z-10">
 
        <motion.div
@@ -53,7 +54,7 @@ const [shoppingList, setShoppingList] = useState({});
   className="mb-10"
 >
   <h1 className="!text-xl font-bold">Qidalanma Planları</h1>
-  <p className="!text-slate-500">
+  <p className="text-slate-400">
     Həftəlik yeməklərinizi planlayın.
   </p>
 </motion.div>

@@ -53,7 +53,7 @@ const userCondition = user?.condition || localStorage.getItem('userCondition') |
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-500 rounded-xl flex items-center justify-center shadow-md">
                   <span className="text-white font-bold text-[17px]">AI</span>
                 </div>
-                <span className="font-bold text-slate-800 text-[17px] tracking-tight">Health Assistant</span>
+                <span className="font-bold text-[17px] tracking-tight">Health Assistant</span>
               </div>
               <button
                 onClick={onToggle}
@@ -123,14 +123,15 @@ const userCondition = user?.condition || localStorage.getItem('userCondition') |
             className={({ isActive }) =>
               `w-full flex  items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-50 to-blue-50/50 text-blue-700 shadow-sm border border-blue-100'
-                  : '!text-slate-800 hover:!bg-slate-50 hover:!text-slate-900'
+           
+  ? 'bg-gradient-to-r from-blue-50 to-blue-50/50 text-blue-700 shadow-sm border border-blue-100'
+  : '!text-slate-800 hover:!bg-slate-50 hover:!text-slate-900'
               }`
             }
           >
             <Icon className="w-5 h-5 stroke-[2.5]" />
             {isOpen && (
-              <span className="text-[15px] font-semibold">
+              <span className="text-[15px] font-semibold dark:!text-slate-200">
                 {item.label}
               </span>
             )}
@@ -155,10 +156,10 @@ const userCondition = user?.condition || localStorage.getItem('userCondition') |
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0 text-left">
-                  <div className="text-[14px] font-semibold text-slate-800 truncate">
+                  <div className="text-[14px] font-semibold truncate">
                     {user?.fullName || 'Giriş edilmeyib'}
                   </div>
-                  <div className="text-[12px] text-slate-500 truncate">
+                  <div className="text-[12px]  truncate">
                     {userCondition}
                   </div>
                 </div>
@@ -167,7 +168,7 @@ const userCondition = user?.condition || localStorage.getItem('userCondition') |
               {onLogout && (
                 <button
                   onClick={onLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-800 hover:bg-red-50 hover:text-red-600 transition-all group !bg-transparent"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all group !bg-transparent"
                 >
                   <LogOut className="w-5 h-5 stroke-[2.5]" />
                   <span className="text-[15px] font-semibold">Çıxış</span>

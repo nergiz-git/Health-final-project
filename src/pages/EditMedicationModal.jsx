@@ -50,7 +50,7 @@ const minutes = Array.from({ length: 60 }, (_, i) =>
 
     
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold">Dərmanı Redaktə Et</h2>
+          <h2 className="text-lg font-bold text-black">Dərmanı Redaktə Et</h2>
           <button onClick={onClose}>
             <X className="text-slate-500" size={18} />
           </button>
@@ -60,25 +60,25 @@ const minutes = Array.from({ length: 60 }, (_, i) =>
         <form onSubmit={handleSubmit} className="space-y-4">
 
           <div className="space-y-2">
-            <Label>Dərmanın Adı</Label>
+            <Label className={"text-black"}>Dərmanın Adı</Label>
             <Input
-            className="bg-[#F3F3F5] border-none"
+            className="bg-[#F3F3F5] border-none !text-slate-500"
               value={formData.name}
               onChange={(e)=>setFormData({...formData,name:e.target.value})}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Doza</Label>
+            <Label className={"text-black"}>Doza</Label>
             <Input
-            className="bg-[#F3F3F5] border-none"
+            className="bg-[#F3F3F5] border-none !text-slate-500"
               value={formData.dose}
               onChange={(e)=>setFormData({...formData,dose:e.target.value})}
             />
           </div>
 
            <div className="space-y-2 relative">
-  <Label>Vaxt *</Label>
+  <Label className={"text-black"}>Vaxt *</Label>
 
 
   <div className="relative">
@@ -168,18 +168,18 @@ const minutes = Array.from({ length: 60 }, (_, i) =>
 </div>
 
           <div className="space-y-2">
-            <Label>Tezlik</Label>
+            <Label className={"text-black"}>Tezlik</Label>
             <Input
-            className="bg-[#F3F3F5] border-none"
+            className="bg-[#F3F3F5] border-none !text-slate-500"
               value={formData.frequency}
               onChange={(e)=>setFormData({...formData,frequency:e.target.value})}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Qeydlər(istəyə görə)</Label>
+            <Label className={"text-black"}>Qeydlər(istəyə görə)</Label>
             <textarea
-              className="w-full  border rounded-lg p-3 resize-none"
+              className="w-full  border rounded-lg p-3 resize-none !text-slate-500"
               rows="3"
               value={formData.note}
               onChange={(e)=>setFormData({...formData,note:e.target.value})}
@@ -187,14 +187,14 @@ const minutes = Array.from({ length: 60 }, (_, i) =>
           </div>
 
         <div className="space-y-2">
-  <Label>Qəbul Şərti (istəyə görə)</Label>
+  <Label className={"text-black"}>Qəbul Şərti (istəyə görə)</Label>
 
   <select
     value={formData.intakeCondition}
     onChange={(e)=>
       setFormData({...formData, intakeCondition: e.target.value})
     }
-    className="w-full h-10 rounded-lg bg-[#F3F3F5] px-3 outline-none"
+    className="w-full h-10 rounded-lg bg-[#F3F3F5] px-3 outline-none !text-slate-500"
   >
     <option value="">Heç biri</option>
     <option value="Yeməkdən əvvəl">Yeməkdən əvvəl</option>

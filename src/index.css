@@ -1,3 +1,4 @@
+@import "tailwindcss";
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -104,4 +105,89 @@ html, body, #root {
 }
 
 
-@import "tailwindcss";
+
+
+/* Default light mode */
+body {
+
+  color: #1D293D;
+  font-family: sans-serif;
+}
+
+/* Light mode container/card backgrounds */
+.light-card {
+  background-color: #EFF6FF;
+}
+.light-secondary {
+  background-color: #F1F5F9;
+}
+.light-info {
+  background-color: #DBEAFE;
+}
+.light-success {
+  background-color: #F0FDF4;
+}
+.light-accent {
+  background-color: #F3E8FF;
+}
+.light-warning {
+  background-color: #FEF3C6;
+}
+.light-subtle {
+  background-color: #FFF7ED;
+}
+
+/* Light gradients */
+.light-gradient-1 {
+  background: linear-gradient(90deg, #EFF6FF 0%, rgba(239,246,255,0.5) 100%);
+}
+.light-gradient-2 {
+  background: linear-gradient(135deg, #F8FAFC 0%, rgba(241,245,249,0.5) 100%);
+}
+
+/* Dark mode */
+body.dark {
+  background-color: #0F172B;
+  color: #E2E8F0;
+}
+
+/* Dark mode container/card backgrounds */
+.dark-card {
+  background-color: #1D293D;
+}
+.dark-secondary {
+  background-color: #314158;
+}
+.dark-info {
+  background-color: #BEDBFF;
+}
+.dark-success {
+  background-color: #B9F8CF;
+
+}
+.dark-accent {
+  background-color: #9810FA;
+}
+.dark-warning {
+  background-color: #E17100;
+}
+.dark-subtle {
+  background-color: #45556C;
+}
+
+/* Dark gradients */
+.dark-gradient-1 {
+  background: linear-gradient(135deg, #2B7FFF 0%, #00C950 100%);
+}
+.dark-gradient-2 {
+  background: linear-gradient(135deg, #1447E6 0%, #008236 100%);
+}
+
+/* Utility classes */
+.bg-white-transparent {
+  background-color: #FFFFFF00;
+}
+
+.dark{
+  color: white;
+}

@@ -157,8 +157,8 @@ export function WorkoutsPage() {
           className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-4"
         >
           <div className="flex-1">
-            <h1 className="!text-2xl sm:text-3xl font-bold text-slate-900">Məşqlər</h1>
-            <p className="text-slate-600 mt-1 text-sm sm:text-base">
+            <h1 className="!text-2xl sm:text-3xl font-bold ">Məşqlər</h1>
+            <p className=" mt-1 text-sm sm:text-base text-slate-400">
               Həftəlik məşq proqramınızı izləyin və aktiv qalın.
             </p>
           </div>

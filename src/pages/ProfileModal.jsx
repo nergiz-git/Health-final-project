@@ -342,7 +342,7 @@ console.log("Token:", localStorage.getItem("token"));
                       className="text-[14px] font-semibold h-8 px-2 py-1"
                     />
                   ) : (
-                    <div className="text-[14px] text-slate-900 font-semibold truncate">
+                    <div className="text-[14px]  font-semibold truncate">
                       {currentData.fullName}
                     </div>
                   )}

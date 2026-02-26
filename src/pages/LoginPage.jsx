@@ -110,7 +110,7 @@ function LoginPage({ onLogin, onSwitchToRegister }) {
 
   return (
     
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-green-50/30 relative overflow-hidden">
+    <div className=" min-h-screen w-full bg-gradient-to-br from-slate-50 via-blue-50/30 to-green-50/30 relative overflow-hidden">
  
 
       <style>{`

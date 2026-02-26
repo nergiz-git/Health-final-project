@@ -9,14 +9,15 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 import MedicationsPage from './pages/MedicationsPage';
 import { WorkoutsPage } from './pages/WorkoutsPage';
 import MealPlansPage from './pages/MealPlansPage';
-
+import { ThemeProvider } from './pages/context/ThemeProvider';
+import { ThemeToggle } from './pages/context/ThemeToggle';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
+const [theme, setTheme] = useState(false);
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('token');
@@ -146,6 +147,7 @@ function App() {
 //   );
 // }
 return (
+   <ThemeProvider>
   <Router>
     <Routes>
 
@@ -206,6 +208,8 @@ return (
 
     </Routes>
   </Router>
+  <ThemeToggle />
+  </ThemeProvider>
 );
 }
 

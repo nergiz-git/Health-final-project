@@ -39,7 +39,7 @@ function MealPlanCard({ mealPlan, onEditClick }) {
           </div>
 
           <div>
-            <h1 className="!text-xl font-bold">Weekly Meal Plan</h1>
+            <h1 className="!text-xl font-bold text-black">Weekly Meal Plan</h1>
             <p className="text-slate-500">Healthy meals for the week</p>
           </div>
         </div>

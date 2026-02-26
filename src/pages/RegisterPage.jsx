@@ -24,6 +24,12 @@ function RegisterPage({ onSwitchToLogin }) {
   const navigate = useNavigate();
   const [showPasswordRules, setShowPasswordRules] = useState(false);
   const [passwordValid, setPasswordValid] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [verificationId, setVerificationId] = useState(null);
+  const [verificationToken, setVerificationToken] = useState(null);
+  const [otpSent, setOtpSent] = useState(false);
+  const [resendAvailableAt, setResendAvailableAt] = useState(null);
+  const [otpLoading, setOtpLoading] = useState(false);
   // const [loading, setLoading] = useState(true);
   const healthConditionCategories = [
     'Ürək–damar sistemi', 'Tənəffüs sistemi', 'Endokrin və maddələr mübadiləsi',
@@ -50,8 +56,10 @@ function RegisterPage({ onSwitchToLogin }) {
     const hasUpper = /[A-Z]/.test(value);
     const hasNumber = /[0-9]/.test(value);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(value);
-
+    const [verificationToken, setVerificationToken] = useState(null);
+    const [verificationSent, setVerificationSent] = useState(false);
     const isValid = hasLength && hasUpper && hasNumber && hasSpecial;
+
     setPasswordValid(isValid);
 
 
@@ -59,15 +67,74 @@ function RegisterPage({ onSwitchToLogin }) {
   };
 
   const getAvailableConditions = () => conditionCategory ? conditionsByCategory[conditionCategory] || [] : [];
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (password !== confirmPassword) {
+  //     alert("Şifrələr eyni deyil!");
+  //     return;
+  //   }
+
+  //   // 🔴 Şifrə qaydalara uyğun deyilsə stop
+  //   if (!passwordValid) {
+  //     alert("Şifrə tələblərə uyğun deyil!");
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     fullName,
+  //     email,
+  //     password,
+  //     dateOfBirth,
+
+  //     gender: gender.toLowerCase(),
+  //     height: Number(height),
+  //     weight: Number(weight),
+  //     conditionId: 1,
+  //     severity: "mild"
+  //   };
+
+  //   try {
+  //     const res = await fetch(`${API_BASE_URL}/auth/register`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(payload)
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       throw new Error(data.message || "Qeydiyyat uğursuz oldu");
+  //     }
+
+  //     console.log("REGISTER SUCCESS:", data);
+
+  //     navigate("/login");
+  //   } catch (err) {
+  //     console.error("REGISTER ERROR:", err);
+  //     alert(err.message);
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!verificationToken) {
+      return alert("Zəhmət olmasa OTP ilə emailinizi təsdiqləyin");
+    }
+
+    if (password !== confirmPassword) {
+      return alert("Şifrələr eyni deyil!");
+    }
+
+    if (!passwordValid) {
+      return alert("Şifrə tələblərə uyğun deyil!");
+    }
 
     const payload = {
       fullName,
       email,
       password,
+      emailVerificationToken: verificationToken,
       dateOfBirth,
-
       gender: gender.toLowerCase(),
       height: Number(height),
       weight: Number(weight),
@@ -84,18 +151,68 @@ function RegisterPage({ onSwitchToLogin }) {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message || "Qeydiyyat uğursuz oldu");
-      }
+      if (!res.ok) throw new Error(data.message || "Qeydiyyat uğursuz oldu");
 
-      console.log("REGISTER SUCCESS:", data);
-
+      alert("Qeydiyyat uğurla tamamlandı!");
       navigate("/login");
+
     } catch (err) {
-      console.error("REGISTER ERROR:", err);
+      console.error(err);
       alert(err.message);
     }
   };
+  const sendOtp = async () => {
+    if (!email) return alert("Zəhmət olmasa email daxil edin");
+
+    setOtpLoading(true);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/email/otp/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "OTP göndərmə uğursuz oldu");
+
+      setVerificationId(data.verificationId);
+      setResendAvailableAt(new Date(data.resendAvailableAt));
+      setOtpSent(true);
+
+      alert("OTP göndərildi. Emailinizi yoxlayın!");
+
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+  const verifyOtp = async () => {
+    if (!otp || !verificationId) return alert("OTP daxil edin");
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/email/otp/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ verificationId, otp })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "OTP təsdiqi uğursuz oldu");
+
+      setVerificationToken(data.verificationToken);
+      alert("Email təsdiqləndi! İndi qeydiyyatı tamamlayın.");
+
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  };
+
   //  if (loading) {
   //   return (
   //     <div className="flex items-center justify-center h-96">
@@ -262,6 +379,35 @@ function RegisterPage({ onSwitchToLogin }) {
                     required
                   />
                 </div>
+                {!otpSent && (
+                  <button
+                    type="button"
+                    onClick={sendOtp}
+                    disabled={otpLoading || !email}
+                    className="w-full !bg-[#F3F3F5] !text-black py-2 rounded-lg mt-2 !cursor-pointer"
+                  >
+                    {otpLoading ? "Göndərilir..." : "OTP Göndər"}
+                  </button>
+                )}
+
+                {otpSent && !verificationToken && (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="OTP daxil edin"
+                      value={otp}
+                      onChange={e => setOtp(e.target.value)}
+                      className="w-full border p-2 rounded-lg mt-2"
+                    />
+                    <button
+                      type="button"
+                      onClick={verifyOtp}
+                      className="w-full !bg-[#F3F3F5] !text-black py-2 rounded-lg mt-2 !cursor-pointer"
+                    >
+                      OTP Təsdiqlə
+                    </button>
+                  </>
+                )}
               </div>
 
 
@@ -277,6 +423,8 @@ function RegisterPage({ onSwitchToLogin }) {
                     type="date"
                     value={dateOfBirth}
                     onChange={e => setDateOfBirth(e.target.value)}
+                    min="1900-01-01"
+                    max={new Date().toISOString().split("T")[0]}
                     className="w-full pl-12 pr-4  py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-[#F3F3F5] text-slate-500"
                     required
                   />
@@ -586,5 +734,3 @@ function RegisterPage({ onSwitchToLogin }) {
 }
 
 export default RegisterPage;
-
-

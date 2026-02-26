@@ -32,7 +32,7 @@ function ShoppingListCard({ shoppingList }) {
           <ShoppingCart />
         </div>
         <div>
-          <h2 className="font-bold text-lg">Alış-Veriş Siyahısı</h2>
+          <h2 className="font-bold text-lg text-black">Alış-Veriş Siyahısı</h2>
           <p className="text-slate-500 text-sm">4 element</p>
         </div>
       </div>

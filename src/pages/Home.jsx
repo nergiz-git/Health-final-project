@@ -273,56 +273,67 @@
 
 
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import NewsCard from '../pages/NewsCard';
 import { Pill, UtensilsCrossed, Dumbbell, Clock, CheckCircle2, Loader2 } from 'lucide-react';
 import medicalBackground from '../assets/images/DashboardPage.png';
 import { motion } from 'framer-motion';
+import MainContext from './context/context';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function DashboardPage() {
   const { user } = useOutletContext();
   const [todaySchedule, setTodaySchedule] = useState(null);
   const [loading, setLoading] = useState(true);
-
+ let { theme } = useContext(MainContext)
   // ✅ Fetch today's schedule from backend
   useEffect(() => {
     fetchTodaySchedule();
   }, []);
 
   const fetchTodaySchedule = async () => {
-    try {
-      const token = localStorage.getItem('token');
+  try {
+    const token = localStorage.getItem('token');
+    console.log('TOKEN:', token);
 
-      if (!token) {
-        console.error('No token found');
-        setLoading(false);
-        return;
-      }
-
-      const res = await fetch(`${API_BASE_URL}/home/today`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        console.log('✅ TODAY SCHEDULE:', data);
-        setTodaySchedule(data);
-      } else {
-        console.error('Failed to fetch schedule');
-        setTodaySchedule({ items: [] });
-      }
-    } catch (err) {
-      console.error('FETCH SCHEDULE ERROR:', err);
-      setTodaySchedule({ items: [] });
-    } finally {
+    if (!token) {
+      console.error('No token found');
       setLoading(false);
+      return;
     }
-  };
+
+    const res = await fetch(`${API_BASE_URL}/home/today`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+const data = await res.json().catch(() => ({}));  // json parsing üçün
+
+if (res.ok) {
+  setTodaySchedule(data);
+} else {
+  // 🔹 Buraya yazırsan
+  console.error('Failed to fetch schedule', res.status, data);
+  setTodaySchedule({ items: [] });
+}
+    // const data = await res.json();
+    // console.log('TODAY SCHEDULE:', data);
+
+    // if (res.ok) {
+    //   setTodaySchedule(data);
+    // } else {
+    //   console.error('Failed to fetch schedule', data);
+    //   setTodaySchedule({ items: [] });
+    // }
+  } catch (err) {
+    console.error('FETCH SCHEDULE ERROR:', err);
+    setTodaySchedule({ items: [] });
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ✅ Map backend types to UI configuration
   const getItemConfig = (type) => {
@@ -406,7 +417,7 @@ function DashboardPage() {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-2 py-6 sm:py-8 lg:py-10 relative">
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-2 py-6 sm:py-8 lg:py-10 relative" >
       {/* Background */}
       <div
         className="fixed inset-0 opacity-25 pointer-events-none"
@@ -429,10 +440,10 @@ function DashboardPage() {
             transition={{ duration: 0.7, ease: "easeOut" }}  // duration-700 = 0.7s
             className="mb-10"
           >
-            <h1 className="text-slate-900 mb-2 !text-[22px] !sm:text-[24px] !lg:text-[28px] font-bold tracking-tight">
+            <h1 className=" mb-2 !text-[22px] !sm:text-[24px] !lg:text-[28px] font-bold tracking-tight">
               Ana Səhifə
             </h1>
-            <p className="text-slate-500 !text-[14px] !sm:text-[15px]">
+            <p className=" !text-[14px] !sm:text-[15px]">
               Bu gün üçün sağlamlıq xülasəniz.
             </p>
           </motion.div>
@@ -446,7 +457,7 @@ function DashboardPage() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }} // Tailwind duration & delay ilə eyni
         >
 
-          <h2 className="text-slate-900 text-[16px] sm:text-[18px] lg:text-[20px] font-bold mb-4 sm:mb-6">
+          <h2 className=" text-[16px] sm:text-[18px] lg:text-[20px] font-bold mb-4 sm:mb-6">
             Bu Günün Cədvəli - {todaySchedule?.dayOfWeek || today}
           </h2>
 
@@ -550,7 +561,7 @@ function DashboardPage() {
         >
 
 
-          <h2 className="text-slate-900 text-[20px] font-bold mb-6">
+          <h2 className=" text-[20px] font-bold mb-6">
             Sağlamlıq Xəbərləri
           </h2>
           <NewsCard />
