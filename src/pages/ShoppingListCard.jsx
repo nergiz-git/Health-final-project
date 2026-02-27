@@ -176,20 +176,20 @@ import { useState } from "react";
 //     {
 //       name: "Meyvələr",
 //       items: [
-//         { id, name, quantity, checked, day: "Bazar ertəsi", mealType: "Breakfast" }
+//         { id, name, quantity, checked, day: "Mon", mealType: "Breakfast" }
 //       ]
 //     }
 //   ]
 // }
 
 const DAYS = [
-  { key: "Bazar ertəsi",      label: "B.e"  },
-  { key: "Çərşənbə axşamı",  label: "Ç.a"  },
-  { key: "Çərşənbə",          label: "Çər"  },
-  { key: "Cümə axşamı",       label: "C.a"  },
-  { key: "Cümə",              label: "Cüm"  },
-  { key: "Şənbə",             label: "Şən"  },
-  { key: "Bazar",             label: "Baz"  },
+  { key: "Mon", label: "B.e"  },
+  { key: "Tue", label: "Ç.a"  },
+  { key: "Wed", label: "Çər"  },
+  { key: "Thu", label: "C.a"  },
+  { key: "Fri", label: "Cüm"  },
+  { key: "Sat", label: "Şən"  },
+  { key: "Sun", label: "Baz"  },
 ];
 
 const MEALS = [
@@ -198,29 +198,31 @@ const MEALS = [
   { key: "Dinner",    label: "Şam Yeməyi"   },
 ];
 
-function ShoppingListCard({ shoppingList, onUpdateItems, onExport }) {
+// onDayChange(dayKey) — MealPlansPage-dən yeni shopping list fetch edir
+function ShoppingListCard({ shoppingList, onUpdateItems, onExport, onDayChange }) {
   const [selectedDay,  setSelectedDay]  = useState(DAYS[0].key);
   const [selectedMeal, setSelectedMeal] = useState(MEALS[0].key);
 
   const categories = shoppingList?.categories || [];
+  const allItems   = categories.flatMap((cat) => cat.items || []);
 
-  // Bütün itemlər
-  const allItems = categories.flatMap((cat) => cat.items || []);
-
-  // Seçilmiş gün + yeməyə görə filter et
+  // Seçilmiş yeməyə görə filter (gün artıq backend-dən gəlir)
   const filteredCategories = categories
     .map((cat) => ({
       ...cat,
       items: (cat.items || []).filter(
-        (item) =>
-          (!item.day      || item.day      === selectedDay) &&
-          (!item.mealType || item.mealType === selectedMeal)
+        (item) => !item.mealType || item.mealType === selectedMeal
       ),
     }))
     .filter((cat) => cat.items.length > 0);
 
   const filteredItems = filteredCategories.flatMap((cat) => cat.items);
   const checkedCount  = filteredItems.filter((i) => i.checked).length;
+
+  const handleDayClick = (dayKey) => {
+    setSelectedDay(dayKey);
+    if (onDayChange) onDayChange(dayKey); // ← backend-dən yeni list fetch edir
+  };
 
   // ── PUT /shopping-lists/{id}/items ────────────────────────────────
   const handleToggleItem = (itemId, currentChecked) => {
@@ -229,8 +231,8 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport }) {
     );
     onUpdateItems(
       updated.map((item) => ({
-        id: item.id,
-        checked: item.checked,
+        id:       item.id,
+        checked:  item.checked,
         quantity: item.quantity,
       }))
     );
@@ -259,13 +261,13 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport }) {
         </div>
       </div>
 
-      {/* DAY TABS */}
+      {/* DAY TABS — tab dəyişəndə backend-dən fetch edir */}
       <div className="px-6 pt-5">
         <div className="bg-slate-100 rounded-xl p-1 flex overflow-x-auto no-scrollbar">
           {DAYS.map((d) => (
             <button
               key={d.key}
-              onClick={() => setSelectedDay(d.key)}
+              onClick={() => handleDayClick(d.key)}
               className={`flex-1 !py-2 !rounded-lg !text-xs sm:!text-sm !font-medium !transition whitespace-nowrap
                 ${selectedDay === d.key
                   ? "!bg-white !shadow !text-blue-600"
@@ -307,13 +309,11 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport }) {
 
         {filteredCategories.map((cat) => (
           <div key={cat.name}>
-            {/* Category header */}
             <div className="flex items-center gap-2 mb-3">
               <span className="w-2 h-2 rounded-full bg-blue-500 inline-block" />
               <span className="font-semibold text-slate-700 text-sm">{cat.name}</span>
             </div>
 
-            {/* Items */}
             <div className="space-y-2">
               {cat.items.map((item) => (
                 <div
@@ -343,7 +343,6 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport }) {
 
       {/* EXPORT BUTTONS */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 px-6 pb-6">
-        {/* Həftəni İxrac Et */}
         <button
           onClick={() => onExport(null)}
           disabled={!shoppingList}
@@ -352,7 +351,6 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport }) {
           <Download size={15} /> Həftəni İxrac Et
         </button>
 
-        {/* Günü İxrac Et */}
         <button
           onClick={() => onExport(selectedDay)}
           disabled={!shoppingList}
@@ -361,7 +359,6 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport }) {
           <Download size={15} /> {selectedDayLabel} İxrac Et
         </button>
 
-        {/* Yeməyi İxrac Et */}
         <button
           onClick={() => onExport(selectedDay)}
           disabled={!shoppingList}

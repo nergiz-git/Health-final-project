@@ -267,9 +267,8 @@
 
 
 
-
 import { useOutletContext } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import MealPlanCard from "./MealPlanCard";
 import ShoppingListCard from "./ShoppingListCard";
 import EditMealModal from "./EditMealModal";
@@ -285,12 +284,15 @@ function MealPlansPage() {
   const [shoppingList, setShoppingList] = useState(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [polling, setPolling] = useState(false);  // AI hələ hazır deyil, gözlənilir
+  const [polling, setPolling] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState("Mon");
 
+  const pollRef = useRef(null);
+
   const getToken = () => localStorage.getItem("token");
 
+  // Həftənin Bazar ertəsi tarixini qaytarır (YYYY-MM-DD)
   const getWeekStart = () => {
     const d = new Date();
     const day = d.getDay();
@@ -299,24 +301,15 @@ function MealPlansPage() {
     return mon.toISOString().split("T")[0];
   };
 
-  // ── GET /meal-plans/current ────────────────────────────────────────
-  const fetchMealPlan = async () => {
+  // ── GET /shopping-lists?weekStart=...&dayOfWeek=... ───────────────
+  // dayOfWeek ötürülməsə həftəlik hamısı gəlir
+  const fetchShoppingList = async (weekStart, dayOfWeek = null) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/meal-plans/current`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      if (res.ok) setMealPlan(await res.json());
-      else setMealPlan(null);
-    } catch (err) {
-      console.error("FETCH MEAL PLAN ERROR:", err);
-      setMealPlan(null);
-    }
-  };
+      const url = dayOfWeek
+        ? `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}&dayOfWeek=${dayOfWeek}`
+        : `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}`;
 
-  // ── GET /shopping-lists/current ───────────────────────────────────
-  const fetchShoppingList = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/shopping-lists/current`, {
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (res.ok) setShoppingList(await res.json());
@@ -327,107 +320,125 @@ function MealPlansPage() {
     }
   };
 
+  // ── Polling məntiqi ───────────────────────────────────────────────
+  const startPolling = (weekStart) => {
+    setPolling(true);
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    pollRef.current = setInterval(async () => {
+      attempts++;
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}`,
+          { headers: { Authorization: `Bearer ${getToken()}` } }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log(`POLL #${attempts}: source=${data?.source}`);
+
+          if (data?.source === "ai") {
+            clearInterval(pollRef.current);
+            setPolling(false);
+            setMealPlan(data);
+            await fetchShoppingList(weekStart);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("POLL ERROR:", err);
+      }
+
+      if (attempts >= maxAttempts) {
+        clearInterval(pollRef.current);
+        setPolling(false);
+        alert("⚠️ AI planı hazırlamaq üçün vaxt lazımdır. Bir az sonra yenidən cəhd edin.");
+      }
+    }, 3000);
+  };
+
+  // ── Page açılanda: GET /meal-plans/ai (force yoxdur) ─────────────
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      await Promise.all([fetchMealPlan(), fetchShoppingList()]);
+      const weekStart = getWeekStart();
+
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}`,
+          { headers: { Authorization: `Bearer ${getToken()}` } }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          setMealPlan(data);
+
+          // AI hələ hazır deyilsə poll başlat
+          if (data?.source !== "ai") {
+            startPolling(weekStart);
+          }
+        } else {
+          setMealPlan(null);
+        }
+      } catch (err) {
+        console.error("INIT MEAL PLAN ERROR:", err);
+        setMealPlan(null);
+      }
+
+      await fetchShoppingList(weekStart);
       setLoading(false);
     };
+
     init();
+
+    // Komponent unmount olanda interval-ı təmizlə
+    return () => clearInterval(pollRef.current);
   }, []);
 
-  // ── GET /meal-plans/ai?weekStart=...&force=true  (ilk trigger) ───
-  // ── GET /meal-plans/ai?weekStart=...            (poll, max 6x) ───
+  // ── User "Generate" basanda: force=true ──────────────────────────
   const handleGenerate = async () => {
+    clearInterval(pollRef.current);
     setGenerating(true);
     setPolling(false);
     const weekStart = getWeekStart();
 
     try {
-      // 1️⃣ force=true ilə AI-ı başlat
-      const triggerRes = await fetch(
+      const res = await fetch(
         `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}&force=true`,
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
 
-      if (!triggerRes.ok) {
-        const err = await triggerRes.json();
+      if (!res.ok) {
+        const err = await res.json();
         throw new Error(err.message || "Plan yaradılmadı");
       }
 
-      const triggerData = await triggerRes.json();
-
-      // Əgər AI dərhal hazır qaytardısa
-      if (triggerData?.source === "ai") {
-        setMealPlan(triggerData);
-        await fetchShoppingListByWeek(weekStart);
-        setGenerating(false);
-        return;
-      }
-
-      // 2️⃣ AI hələ hazır deyil — poll et (hər 3 saniyə, max 6 dəfə)
+      const data = await res.json();
       setGenerating(false);
-      setPolling(true);
 
-      let attempts = 0;
-      const maxAttempts = 6;
-
-      const pollInterval = setInterval(async () => {
-        attempts++;
-        try {
-          const pollRes = await fetch(
-            `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}`,
-            { headers: { Authorization: `Bearer ${getToken()}` } }
-          );
-
-          if (pollRes.ok) {
-            const pollData = await pollRes.json();
-            console.log(`POLL #${attempts}:`, pollData?.source);
-
-            if (pollData?.source === "ai") {
-              // ✅ AI hazırdır
-              clearInterval(pollInterval);
-              setPolling(false);
-              setMealPlan(pollData);
-              await fetchShoppingListByWeek(weekStart);
-              return;
-            }
-          }
-        } catch (err) {
-          console.error("POLL ERROR:", err);
-        }
-
-        // Max cəhd bitdi
-        if (attempts >= maxAttempts) {
-          clearInterval(pollInterval);
-          setPolling(false);
-          alert("⚠️ AI planı hazırlamaq üçün vaxt lazımdır. Bir az sonra yenidən cəhd edin.");
-        }
-      }, 3000); // hər 3 saniyə
-
+      if (data?.source === "ai") {
+        setMealPlan(data);
+        await fetchShoppingList(weekStart);
+      } else {
+        // AI fonda hazırlanır — poll et
+        startPolling(weekStart);
+      }
     } catch (err) {
       console.error("GENERATE ERROR:", err);
       alert(err.message || "Xəta baş verdi");
       setGenerating(false);
-      setPolling(false);
     }
   };
 
-  // ── GET /shopping-lists?weekStart=... ────────────────────────────
-  const fetchShoppingListByWeek = async (weekStart) => {
-    try {
-      const res = await fetch(
-        `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}`,
-        { headers: { Authorization: `Bearer ${getToken()}` } }
-      );
-      if (res.ok) setShoppingList(await res.json());
-    } catch (err) {
-      console.error("FETCH SHOPPING LIST ERROR:", err);
-    }
+  // ── Tab dəyişəndə shopping list-i günə görə fetch et ─────────────
+  const handleDayTabChange = async (dayKey) => {
+    setSelectedDay(dayKey);
+    const weekStart = getWeekStart();
+    await fetchShoppingList(weekStart, dayKey);
   };
 
   // ── PUT /meal-plans/{id} ──────────────────────────────────────────
-  // EditMealModal-dan gələn formData-nı backend formatına çevir
   const handleSaveMeal = async (dayKey, formData) => {
     if (!mealPlan?.id) return;
 
@@ -435,8 +446,8 @@ function MealPlansPage() {
       dayOfWeek: dayKey,
       meals: [
         { mealType: "Breakfast", title: formData.breakfast, time: formData.breakfastTime },
-        { mealType: "Lunch",     title: formData.lunch,     time: formData.lunchTime     },
-        { mealType: "Dinner",    title: formData.dinner,    time: formData.dinnerTime    },
+        { mealType: "Lunch",     title: formData.lunch,     time: formData.lunchTime },
+        { mealType: "Dinner",    title: formData.dinner,    time: formData.dinnerTime },
       ],
     };
 
@@ -458,7 +469,13 @@ function MealPlansPage() {
         const err = await res.json();
         throw new Error(err.message || "Yenilənmədi");
       }
-      await fetchMealPlan();
+      // Yenidən fetch et
+      const weekStart = getWeekStart();
+      const refreshed = await fetch(
+        `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}`,
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      if (refreshed.ok) setMealPlan(await refreshed.json());
     } catch (err) {
       console.error("UPDATE MEAL ERROR:", err);
       alert(err.message);
@@ -484,7 +501,7 @@ function MealPlansPage() {
         const err = await res.json();
         throw new Error(err.message || "Yenilənmədi");
       }
-      await fetchShoppingList();
+      await fetchShoppingList(getWeekStart(), selectedDay);
     } catch (err) {
       console.error("UPDATE SHOPPING LIST ERROR:", err);
       alert(err.message);
@@ -569,6 +586,7 @@ function MealPlansPage() {
             onExport={handleExportMealPlan}
             generating={generating}
             polling={polling}
+            onDayChange={handleDayTabChange}
           />
         </div>
 
@@ -581,6 +599,7 @@ function MealPlansPage() {
             shoppingList={shoppingList}
             onUpdateItems={handleUpdateShoppingItems}
             onExport={handleExportShoppingList}
+            onDayChange={handleDayTabChange}
           />
         </motion.div>
 

@@ -20,17 +20,61 @@ const token = localStorage.getItem('token');
 //       })
 //       .catch((err) => console.error("Error loading news:", err));
 //   }, []);
+// useEffect(() => {
+//   const token = localStorage.getItem('token');
+//   fetch(`${API_BASE_URL}/news/load`, {
+//     headers: { 'Authorization': `Bearer ${token}` }
+//   })
+//     .then((res) => res.json())
+//     .then((data) => {
+//       setNews(Array.isArray(data) ? data : []);  // ← bura
+//     })
+//     .catch((err) => console.error("Error loading news:", err));
+// }, []);
 useEffect(() => {
-  const token = localStorage.getItem('token');
   fetch(`${API_BASE_URL}/news/load`, {
     headers: { 'Authorization': `Bearer ${token}` }
   })
-    .then((res) => res.json())
-    .then((data) => {
-      setNews(Array.isArray(data) ? data : []);  // ← bura
+    .then(async (res) => {
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      console.log("News data:", data);
+      setNews(Array.isArray(data) ? data : []);
     })
-    .catch((err) => console.error("Error loading news:", err));
+    .catch((err) => {
+      console.error("Error loading news:", err);
+      setNews([]);
+    });
 }, []);
+
+// useEffect(() => {
+//   const token = localStorage.getItem('token');
+
+//   fetch(`${API_BASE_URL}/news/load`, {
+//     headers: { 'Authorization': `Bearer ${token}` }
+//   })
+//     .then(async (res) => {
+//       const data = await res.json().catch(() => ({}));
+
+//       console.log("STATUS:", res.status);
+//       console.log("DATA:", data);
+
+//       setNews(Array.isArray(data) ? data : []);
+//     })
+//     .catch((err) => console.error("Error loading news:", err));
+// }, []);
+// useEffect(() => {
+//   const token = localStorage.getItem('token');
+
+//   fetch(`${API_BASE_URL}/news/load`, {
+//     headers: { 'Authorization': `Bearer ${token}` }
+//   })
+//     .then(res => res.json())
+//     .then(data => {
+//       setNews(Array.isArray(data) ? data : []);
+//     })
+//     .catch(err => console.error(err));
+// }, []);
 useEffect(() => {
   fetch(`${API_BASE_URL}/news/saved/all`,{
   headers: { 'Authorization': `Bearer ${token}` }
