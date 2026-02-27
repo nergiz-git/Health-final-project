@@ -7,7 +7,7 @@ import Home from './pages/Home';
 import Layout from './layout/layout';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import MedicationsPage from './pages/MedicationsPage';
-import { WorkoutsPage } from './pages/WorkoutsPage';
+import  WorkoutsPage  from './pages/WorkoutsPage';
 import MealPlansPage from './pages/MealPlansPage';
 import { ThemeProvider } from './pages/context/ThemeProvider';
 import { ThemeToggle } from './pages/context/ThemeToggle';
@@ -208,7 +208,7 @@ return (
 
     </Routes>
   </Router>
-  <ThemeToggle />
+
   </ThemeProvider>
 );
 }

@@ -7,8 +7,7 @@ import { Button } from "../ui/Button";
 import { motion } from "framer-motion";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-export function WorkoutsPage() {
+ function WorkoutsPage() {
   const { user } = useOutletContext();
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -344,10 +343,7 @@ export function WorkoutsPage() {
 
 
 
-
-
-
-
+export default WorkoutsPage;
 
 
 

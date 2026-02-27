@@ -203,6 +203,7 @@ import Sidebar from '../layout/Sidebar';
 import { Header } from '../layout/Header';
 import backgroundImage from '../assets/images/DashboardPage.png';
 import ProfileModal from "../pages/ProfileModal";
+import { ThemeToggle } from '../pages/context/ThemeToggle';
 
 function Layout({ user, onLogout, onUpdateUser }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -282,6 +283,7 @@ function Layout({ user, onLogout, onUpdateUser }) {
         )}
 
         <Header user={user} onLogout={onLogout} />
+         <ThemeToggle />
 
         <main className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
           <div className="max-w-[1480px] 2xl:max-w-[1620px] w-full mx-auto">
