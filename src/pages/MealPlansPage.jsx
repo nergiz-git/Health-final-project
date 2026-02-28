@@ -90,7 +90,7 @@
 //       setGenerating(false);
 //     }
 //   };
-  
+
 
 //   // ── PUT /meal-plans/{id} ──────────────────────────────────────────
 //   // EditMealModal-dan gələn formData-nı backend formatına çevir
@@ -321,10 +321,46 @@ function MealPlansPage() {
   };
 
   // ── Polling məntiqi ───────────────────────────────────────────────
+  // const startPolling = (weekStart) => {
+  //   setPolling(true);
+  //   let attempts = 0;
+  //   const maxAttempts = 10;
+
+  //   pollRef.current = setInterval(async () => {
+  //     attempts++;
+  //     try {
+  //       const res = await fetch(
+  //         `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}`,
+  //         { headers: { Authorization: `Bearer ${getToken()}` } }
+  //       );
+
+  //       if (res.ok) {
+  //         const data = await res.json();
+  //         console.log(`POLL #${attempts}: source=${data?.source}`);
+
+  //         if (data?.source === "ai") {
+  //           clearInterval(pollRef.current);
+  //           setPolling(false);
+  //           setMealPlan(data);
+  //           await fetchShoppingList(weekStart);
+  //           return;
+  //         }
+  //       }
+  //     } catch (err) {
+  //       console.error("POLL ERROR:", err);
+  //     }
+
+  //     if (attempts >= maxAttempts) {
+  //       clearInterval(pollRef.current);
+  //       setPolling(false);
+  //       alert("⚠️ AI planı hazırlamaq üçün vaxt lazımdır. Bir az sonra yenidən cəhd edin.");
+  //     }
+  //   }, 3000);
+  // };
   const startPolling = (weekStart) => {
     setPolling(true);
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 20; // 10 → 20
 
     pollRef.current = setInterval(async () => {
       attempts++;
@@ -336,9 +372,11 @@ function MealPlansPage() {
 
         if (res.ok) {
           const data = await res.json();
-          console.log(`POLL #${attempts}: source=${data?.source}`);
+          console.log(`POLL #${attempts}: source=${data?.source}`, data);
 
-          if (data?.source === "ai") {
+          // source "ai" olsa VƏ YA days varsa planı göstər
+          // if (data?.source === "ai" || (data?.days && data.days.length > 0)) 
+            if (data?.source === "ai"){
             clearInterval(pollRef.current);
             setPolling(false);
             setMealPlan(data);
@@ -355,9 +393,8 @@ function MealPlansPage() {
         setPolling(false);
         alert("⚠️ AI planı hazırlamaq üçün vaxt lazımdır. Bir az sonra yenidən cəhd edin.");
       }
-    }, 3000);
+    }, 5000); // 3000 → 5000ms
   };
-
   // ── Page açılanda: GET /meal-plans/ai (force yoxdur) ─────────────
   useEffect(() => {
     const init = async () => {
@@ -370,15 +407,40 @@ function MealPlansPage() {
           { headers: { Authorization: `Bearer ${getToken()}` } }
         );
 
-        if (res.ok) {
-          const data = await res.json();
-          setMealPlan(data);
+        // if (res.ok) {
+        //   const data = await res.json();
+        //   setMealPlan(data);
 
-          // AI hələ hazır deyilsə poll başlat
-          if (data?.source !== "ai") {
-            startPolling(weekStart);
-          }
-        } else {
+        //   if (data?.source !== "ai") {
+        //     startPolling(weekStart);
+        //   }
+        // }
+        // if (res.ok) {
+        //   const data = await res.json();
+        //   setMealPlan(data); // həmişə göstər
+
+        //   // Yalnız days yoxdursa poll başlat
+        //   if (data?.source !== "ai" && (!data?.days || data.days.length === 0)) {
+        //     startPolling(weekStart);
+        //   }
+        // }
+//         if (res.ok) {
+//   const data = await res.json();
+
+
+//   if (data?.source === "ai") {
+//     setMealPlan(data);
+//   } else {
+//     setMealPlan(null);   
+//     startPolling(weekStart); 
+//   }
+// }
+if (res.ok) {
+  const data = await res.json();
+  setMealPlan(data); // source-dan asılı olmayaraq göstər
+}
+
+        else {
           setMealPlan(null);
         }
       } catch (err) {
@@ -386,7 +448,7 @@ function MealPlansPage() {
         setMealPlan(null);
       }
 
-     await fetchShoppingList(weekStart, "Mon");
+      await fetchShoppingList(weekStart, "Mon");
       setLoading(false);
     };
 
@@ -402,7 +464,7 @@ function MealPlansPage() {
     setGenerating(true);
     setPolling(false);
     const weekStart = getWeekStart();
-
+ 
     try {
       const res = await fetch(
         `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}&force=true`,
@@ -415,22 +477,25 @@ function MealPlansPage() {
       }
 
       const data = await res.json();
+       console.log("GENERATE RESPONSE:", data);
       setGenerating(false);
-
-      if (data?.source === "ai") {
-        setMealPlan(data);
-        await fetchShoppingList(weekStart);
-      } else {
-        // AI fonda hazırlanır — poll et
-        startPolling(weekStart);
-      }
+       
+      // if (data?.source === "ai") {
+      //   setMealPlan(data);
+      //   await fetchShoppingList(weekStart);
+      // } else {
+      //   // AI fonda hazırlanır — poll et
+      //   startPolling(weekStart);
+      // }
+      setMealPlan(data);
+await fetchShoppingList(weekStart);
     } catch (err) {
       console.error("GENERATE ERROR:", err);
       alert(err.message || "Xəta baş verdi");
       setGenerating(false);
     }
   };
-
+   
   // ── Tab dəyişəndə shopping list-i günə görə fetch et ─────────────
   // const handleDayTabChange = async (dayKey) => {
   //   setSelectedDay(dayKey);
@@ -438,10 +503,10 @@ function MealPlansPage() {
   //   await fetchShoppingList(weekStart, dayKey);
   // };
   const handleDayTabChange = async (dayKey) => {
-  setSelectedDay(dayKey);
-  const weekStart = getWeekStart();
-  await fetchShoppingList(weekStart, dayKey); // backendə gün göndər
-};
+    setSelectedDay(dayKey);
+    const weekStart = getWeekStart();
+    await fetchShoppingList(weekStart, dayKey); // backendə gün göndər
+  };
 
   // ── PUT /meal-plans/{id} ──────────────────────────────────────────
   const handleSaveMeal = async (dayKey, formData) => {
@@ -451,8 +516,8 @@ function MealPlansPage() {
       dayOfWeek: dayKey,
       meals: [
         { mealType: "Breakfast", title: formData.breakfast, time: formData.breakfastTime },
-        { mealType: "Lunch",     title: formData.lunch,     time: formData.lunchTime },
-        { mealType: "Dinner",    title: formData.dinner,    time: formData.dinnerTime },
+        { mealType: "Lunch", title: formData.lunch, time: formData.lunchTime },
+        { mealType: "Dinner", title: formData.dinner, time: formData.dinnerTime },
       ],
     };
 
@@ -585,7 +650,7 @@ function MealPlansPage() {
 
         <div className="mb-10">
           <MealPlanCard
-          selectedDay={selectedDay}
+            selectedDay={selectedDay}
             mealPlan={mealPlan}
             onEditClick={handleEditClick}
             onGenerate={handleGenerate}
@@ -602,7 +667,7 @@ function MealPlansPage() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
         >
           <ShoppingListCard
-          initialDay={selectedDay}
+            initialDay={selectedDay}
             shoppingList={shoppingList}
             onUpdateItems={handleUpdateShoppingItems}
             onExport={handleExportShoppingList}

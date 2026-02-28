@@ -26,7 +26,8 @@ function Sidebar({ isOpen, onToggle, user, onLogout, currentPage, onNavigate, on
   { icon: Dumbbell, label: 'Məşqlər', path: '/workouts' },
 ];
 
-const userCondition = user?.condition || localStorage.getItem('userCondition') || 'Xəstəlik seçilməyib';
+// const userCondition = user?.condition || localStorage.getItem('userCondition') || 'Xəstəlik seçilməyib';
+const userCondition = user?.healthCondition || user?.condition || localStorage.getItem('userCondition') || 'Xəstəlik seçilməyib';
 
   return (
     <aside

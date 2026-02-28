@@ -29,86 +29,97 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
   }, [user]);
 console.log("Token:", localStorage.getItem("token"));
 
-  const healthConditionCategories = [
-    'Ürək–damar sistemi',
-    'Tənəffüs sistemi',
-    'Endokrin və maddələr mübadiləsi',
-    'Sinir sistemi',
-    'Əzələ–skelet sistemi',
-    'Həzm sistemi (mədə–bağırsaq)',
-    'İmmun və autoimmun xəstəliklər',
-    'Psixi pozuntular',
-    'Qan və qan yaradan orqanlar',
-    'Böyrək və qaraciyər xəstəlikləri',
-  ];
+  // const healthConditionCategories = [
+  //   'Ürək–damar sistemi',
+  //   'Tənəffüs sistemi',
+  //   'Endokrin və maddələr mübadiləsi',
+  //   'Sinir sistemi',
+  //   'Əzələ–skelet sistemi',
+  //   'Həzm sistemi (mədə–bağırsaq)',
+  //   'İmmun və autoimmun xəstəliklər',
+  //   'Psixi pozuntular',
+  //   'Qan və qan yaradan orqanlar',
+  //   'Böyrək və qaraciyər xəstəlikləri',
+  // ];
 
-  const conditionsByCategory = {
-    'Ürək–damar sistemi': [
-      'Arterial hipertenziya',
-      'İskemik ürək xəstəliyi',
-      'Ürək çatışmazlığı',
-      'Aritmiya',
-      'Ateroskleroz',
-    ],
-    'Tənəffüs sistemi': [
-      'Bronxial astma',
-      'Xroniki bronxit',
-      'Xroniki obstruktiv ağciyər xəstəliyi (XOAX)',
-      'Allergik rinit',
-    ],
-    'Endokrin və maddələr mübadiləsi': [
-      'Şəkərli diabet (I və II tip)',
-      'Hipotireoz',
-      'Hipertireoz',
-      'Piylənmə',
-      'Metabolik sindrom',
-    ],
-    'Sinir sistemi': [
-      'Epilepsiya',
-      'Miqren',
-      'Parkinson xəstəliyi',
-      'Dağınıq skleroz',
-    ],
-    'Əzələ–skelet sistemi': [
-      'Osteoxondroz',
-      'Artroz',
-      'Artrit',
-      'Revmatoid artrit',
-      'Osteoporoz',
-    ],
-    'Həzm sistemi (mədə–bağırsaq)': [
-      'Xroniki qastrit',
-      'Mədə və onikibarmaq bağırsaq xorası',
-      'Xroniki pankreatit',
-      'Qıcıqlanmış bağırsaq sindromu',
-    ],
-    'İmmun və autoimmun xəstəliklər': [
-      'Psoriaz',
-      'Sistem qırmızı qurdeşənəyi',
-      'Kron xəstəliyi',
-      'Çölyak xəstəliyi',
-    ],
-    'Psixi pozuntular': [
-      'Depressiv pozuntular',
-      'Anksiyete pozuntuları',
-      'Bipolyar pozuntu',
-    ],
-    'Qan və qan yaradan orqanlar': [
-      'Xroniki anemiya',
-      'Talassemiya',
-    ],
-    'Böyrək və qaraciyər xəstəlikləri': [
-      'Xroniki böyrək çatışmazlığı',
-      'Xroniki hepatit',
-      'Qaraciyər sirrozu',
-    ],
-  };
+  // const conditionsByCategory = {
+  //   'Ürək–damar sistemi': [
+  //     'Arterial hipertenziya',
+  //     'İskemik ürək xəstəliyi',
+  //     'Ürək çatışmazlığı',
+  //     'Aritmiya',
+  //     'Ateroskleroz',
+  //   ],
+  //   'Tənəffüs sistemi': [
+  //     'Bronxial astma',
+  //     'Xroniki bronxit',
+  //     'Xroniki obstruktiv ağciyər xəstəliyi (XOAX)',
+  //     'Allergik rinit',
+  //   ],
+  //   'Endokrin və maddələr mübadiləsi': [
+  //     'Şəkərli diabet (I və II tip)',
+  //     'Hipotireoz',
+  //     'Hipertireoz',
+  //     'Piylənmə',
+  //     'Metabolik sindrom',
+  //   ],
+  //   'Sinir sistemi': [
+  //     'Epilepsiya',
+  //     'Miqren',
+  //     'Parkinson xəstəliyi',
+  //     'Dağınıq skleroz',
+  //   ],
+  //   'Əzələ–skelet sistemi': [
+  //     'Osteoxondroz',
+  //     'Artroz',
+  //     'Artrit',
+  //     'Revmatoid artrit',
+  //     'Osteoporoz',
+  //   ],
+  //   'Həzm sistemi (mədə–bağırsaq)': [
+  //     'Xroniki qastrit',
+  //     'Mədə və onikibarmaq bağırsaq xorası',
+  //     'Xroniki pankreatit',
+  //     'Qıcıqlanmış bağırsaq sindromu',
+  //   ],
+  //   'İmmun və autoimmun xəstəliklər': [
+  //     'Psoriaz',
+  //     'Sistem qırmızı qurdeşənəyi',
+  //     'Kron xəstəliyi',
+  //     'Çölyak xəstəliyi',
+  //   ],
+  //   'Psixi pozuntular': [
+  //     'Depressiv pozuntular',
+  //     'Anksiyete pozuntuları',
+  //     'Bipolyar pozuntu',
+  //   ],
+  //   'Qan və qan yaradan orqanlar': [
+  //     'Xroniki anemiya',
+  //     'Talassemiya',
+  //   ],
+  //   'Böyrək və qaraciyər xəstəlikləri': [
+  //     'Xroniki böyrək çatışmazlığı',
+  //     'Xroniki hepatit',
+  //     'Qaraciyər sirrozu',
+  //   ],
+  // };
+  const [categories, setCategories] = useState([]);
 
-  const getAvailableConditions = () => {
-    if (!editedUser.conditionCategory) return [];
-    return conditionsByCategory[editedUser.conditionCategory] || [];
-  };
-
+useEffect(() => {
+  fetch(`${API_BASE_URL}/conditions`)
+    .then(res => res.json())
+    .then(data => setCategories(data))
+    .catch(err => console.error(err));
+}, []);
+  // const getAvailableConditions = () => {
+  //   if (!editedUser.conditionCategory) return [];
+  //   return conditionsByCategory[editedUser.conditionCategory] || [];
+  // };
+ const getAvailableConditions = () => {
+  if (!editedUser.conditionCategory) return [];
+  const cat = categories.find(c => c.name === editedUser.conditionCategory);
+  return cat?.conditions || [];
+};
   if (!isOpen) return null;
 
   const getInitials = (name) => {
@@ -317,7 +328,8 @@ console.log("Token:", localStorage.getItem("token"));
               {currentData.fullName}
             </h3>
             <p className="text-slate-500 text-[15px]">
-              {currentData.condition}
+              {/* {currentData.condition} */}
+              {currentData.healthCondition || currentData.condition || "-"}
             </p>
           </div>
 
@@ -525,20 +537,31 @@ console.log("Token:", localStorage.getItem("token"));
                 <div className="flex-1 min-w-0">
                   <div className="text-[12px] text-slate-500 font-medium mb-0.5">Xəstəlik Növü</div>
                   {isEditing ? (
+                    // <select
+                    //   value={editedUser.condition}
+                    //   onChange={(e) => setEditedUser({ ...editedUser, condition: e.target.value })}
+                    //   className="w-full text-[14px] font-semibold h-8 px-2 py-1 border border-slate-300 rounded-md bg-white "
+                    // >
+                    //   {getAvailableConditions().map((condition) => (
+                    //     <option key={condition} value={condition}>
+                    //       {condition}
+                    //     </option>
+                    //   ))}
+                    // </select>
                     <select
-                      value={editedUser.condition}
-                      onChange={(e) => setEditedUser({ ...editedUser, condition: e.target.value })}
-                      className="w-full text-[14px] font-semibold h-8 px-2 py-1 border border-slate-300 rounded-md bg-white "
-                    >
-                      {getAvailableConditions().map((condition) => (
-                        <option key={condition} value={condition}>
-                          {condition}
-                        </option>
-                      ))}
-                    </select>
+  value={editedUser.condition || editedUser.healthCondition || ""}
+  onChange={(e) => setEditedUser({ ...editedUser, condition: e.target.value })}
+  className="w-full text-[14px] font-semibold h-8 px-2 py-1 border border-slate-300 rounded-md bg-white"
+>
+  <option value="">Seçin</option>
+  {getAvailableConditions().map((c) => (
+    <option key={c.id} value={c.name}>{c.name}</option>
+  ))}
+</select>
                   ) : (
                     <div className="text-[14px] text-slate-900 font-semibold">
-                      {currentData.condition}
+                      {/* {currentData.condition} */}
+                      {currentData.healthCondition || currentData.condition || ""}
                     </div>
                   )}
                   

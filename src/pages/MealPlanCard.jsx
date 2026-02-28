@@ -189,8 +189,16 @@ import { motion } from "framer-motion";
 //   ]
 // }
 
-function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating, polling }) {
-  const [selectedDay, setSelectedDay] = useState("Mon");
+function MealPlanCard({   mealPlan, 
+  selectedDay,
+  onDayChange,
+  onEditClick, 
+  onGenerate, 
+  onExport, 
+  generating, 
+  polling 
+ }) {
+  // const [selectedDay, setSelectedDay] = useState("Mon");
 
   const days = [
     { key: "Mon", label: "B.e" },
@@ -273,7 +281,8 @@ function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating,
           {days.map((d) => (
             <button
               key={d.key}
-              onClick={() => setSelectedDay(d.key)}
+              // onClick={() => setSelectedDay(d.key)}
+              onClick={() => onDayChange(d.key)}
               className={`flex-1 !py-2 !rounded-lg !text-sm !font-medium !transition
                 ${selectedDay === d.key
                   ? "!bg-white !shadow !text-emerald-600"
