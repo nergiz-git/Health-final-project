@@ -6,7 +6,7 @@ function NewsCard() {
   const [visibleCount, setVisibleCount] = useState(6);
   const [news, setNews] = useState([]);
  const [savedNews, setSavedNews] = useState([]);
-const token = localStorage.getItem('token');
+// const token = localStorage.getItem('token');
 //   useEffect(() => {
 //     fetch(`${API_BASE_URL}/news/load`,{
 //   headers: { 'Authorization': `Bearer ${token}` }
@@ -31,21 +31,21 @@ const token = localStorage.getItem('token');
 //     })
 //     .catch((err) => console.error("Error loading news:", err));
 // }, []);
-useEffect(() => {
-  fetch(`${API_BASE_URL}/news/load`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  })
-    .then(async (res) => {
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-      console.log("News data:", data);
-      setNews(Array.isArray(data) ? data : []);
-    })
-    .catch((err) => {
-      console.error("Error loading news:", err);
-      setNews([]);
-    });
-}, []);
+// useEffect(() => {
+//   fetch(`${API_BASE_URL}/news/load`, {
+//     headers: { 'Authorization': `Bearer ${token}` }
+//   })
+//     .then(async (res) => {
+//       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+//       const data = await res.json();
+//       console.log("News data:", data);
+//       setNews(Array.isArray(data) ? data : []);
+//     })
+//     .catch((err) => {
+//       console.error("Error loading news:", err);
+//       setNews([]);
+//     });
+// }, []);
 
 // useEffect(() => {
 //   const token = localStorage.getItem('token');
@@ -75,15 +75,39 @@ useEffect(() => {
 //     })
 //     .catch(err => console.error(err));
 // }, []);
-useEffect(() => {
-  fetch(`${API_BASE_URL}/news/saved/all`,{
-  headers: { 'Authorization': `Bearer ${token}` }
-})
-    .then((res) => res.json())
-    .then((data) => setSavedNews(data))
-    .catch((err) => console.error(err));
-}, []);
+// useEffect(() => {
+//   fetch(`${API_BASE_URL}/news/saved/all`,{
+//   headers: { 'Authorization': `Bearer ${token}` }
+// })
+//     .then((res) => res.json())
+//     .then((data) => setSavedNews(data))
+//     .catch((err) => console.error(err));
+// }, []);
+ useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch(`${API_BASE_URL}/news/load`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        setNews(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error("Error loading news:", err);
+        setNews([]);
+      });
+  }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    fetch(`${API_BASE_URL}/news/saved/all`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then((res) => res.json())
+      .then((data) => setSavedNews(data))
+      .catch((err) => console.error(err));
+  }, []);
   const handleSave = async (item) => {
     try {
       const response = await fetch(`${API_BASE_URL}/news/save`, {
@@ -155,12 +179,22 @@ const handleDelete = async (id) => {
             className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden hover:shadow-md transition-all group"
           >
             {/* Image */}
-            <div className="relative h-48 overflow-hidden">
+            {/* <div className="relative h-48 overflow-hidden">
               <ImageWithFallback
                 src={item.image}
                 alt={item.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
+              /> */}
+              {/* Image */}
+<div className="relative h-48 overflow-hidden bg-slate-100">
+  <img
+    src={item.image || `https://picsum.photos/seed/${encodeURIComponent(item.sourceDomain)}/400/200`}
+    alt={item.title}
+    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+    onError={(e) => {
+      e.target.src = "https://placehold.co/400x200/e2e8f0/64748b?text=Health+News";
+    }}
+  />
               <div className="absolute top-3 right-3">
                 <span
                   className={`px-3 py-1.5 rounded-full text-[12px] font-semibold backdrop-blur-sm ${getCategoryColor(

@@ -386,7 +386,7 @@ function MealPlansPage() {
         setMealPlan(null);
       }
 
-      await fetchShoppingList(weekStart);
+     await fetchShoppingList(weekStart, "Mon");
       setLoading(false);
     };
 
@@ -432,11 +432,16 @@ function MealPlansPage() {
   };
 
   // ── Tab dəyişəndə shopping list-i günə görə fetch et ─────────────
+  // const handleDayTabChange = async (dayKey) => {
+  //   setSelectedDay(dayKey);
+  //   const weekStart = getWeekStart();
+  //   await fetchShoppingList(weekStart, dayKey);
+  // };
   const handleDayTabChange = async (dayKey) => {
-    setSelectedDay(dayKey);
-    const weekStart = getWeekStart();
-    await fetchShoppingList(weekStart, dayKey);
-  };
+  setSelectedDay(dayKey);
+  const weekStart = getWeekStart();
+  await fetchShoppingList(weekStart, dayKey); // backendə gün göndər
+};
 
   // ── PUT /meal-plans/{id} ──────────────────────────────────────────
   const handleSaveMeal = async (dayKey, formData) => {
@@ -580,6 +585,7 @@ function MealPlansPage() {
 
         <div className="mb-10">
           <MealPlanCard
+          selectedDay={selectedDay}
             mealPlan={mealPlan}
             onEditClick={handleEditClick}
             onGenerate={handleGenerate}
@@ -596,6 +602,7 @@ function MealPlansPage() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.3 }}
         >
           <ShoppingListCard
+          initialDay={selectedDay}
             shoppingList={shoppingList}
             onUpdateItems={handleUpdateShoppingItems}
             onExport={handleExportShoppingList}

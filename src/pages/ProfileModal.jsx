@@ -528,7 +528,7 @@ console.log("Token:", localStorage.getItem("token"));
                     <select
                       value={editedUser.condition}
                       onChange={(e) => setEditedUser({ ...editedUser, condition: e.target.value })}
-                      className="w-full text-[14px] font-semibold h-8 px-2 py-1 border border-slate-300 rounded-md bg-white"
+                      className="w-full text-[14px] font-semibold h-8 px-2 py-1 border border-slate-300 rounded-md bg-white "
                     >
                       {getAvailableConditions().map((condition) => (
                         <option key={condition} value={condition}>

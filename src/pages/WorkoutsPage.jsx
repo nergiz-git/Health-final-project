@@ -148,7 +148,7 @@ const fetchWorkouts = async () => {
     const token = localStorage.getItem("token");
     const weekStart = getWeekStartDate();
 
-    const res = await fetch(`${API_BASE_URL}/workouts/ai?weekStart=${weekStart}`, {
+    const res = await fetch(`${API_BASE_URL}/workouts/ai?weekStart=${weekStart}&force=true`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });

@@ -3,7 +3,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { CheckCircle, Heart, HeartPulse, Ruler, Weight, Loader2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 
@@ -25,25 +25,30 @@ function RegisterPage({ onSwitchToLogin }) {
   const [showPasswordRules, setShowPasswordRules] = useState(false);
   const [passwordValid, setPasswordValid] = useState(false);
   // const [loading, setLoading] = useState(true);
-  const healthConditionCategories = [
-    'Ürək–damar sistemi', 'Tənəffüs sistemi', 'Endokrin və maddələr mübadiləsi',
-    'Sinir sistemi', 'Əzələ–skelet sistemi', 'Həzm sistemi (mədə–bağırsaq)',
-    'İmmun və autoimmun xəstəliklər', 'Psixi pozuntular',
-    'Qan və qan yaradan orqanlar', 'Böyrək və qaraciyər xəstəlikləri'
-  ];
+  const [conditions, setConditions] = useState([]);
+  const [selectedConditionId, setSelectedConditionId] = useState("");
+  
+const [categories, setCategories] = useState([]);
 
-  const conditionsByCategory = {
-    'Ürək–damar sistemi': ['Arterial hipertenziya', 'İskemik ürək xəstəliyi', 'Ürək çatışmazlığı', 'Aritmiya', 'Ateroskleroz'],
-    'Tənəffüs sistemi': ['Bronxial astma', 'Xroniki bronxit', 'XOAX', 'Allergik rinit'],
-    'Endokrin və maddələr mübadiləsi': ['Şəkərli diabet', 'Hipotireoz', 'Hipertireoz', 'Piylənmə', 'Metabolik sindrom'],
-    'Sinir sistemi': ['Epilepsiya', 'Miqren', 'Parkinson', 'Dağınıq skleroz'],
-    'Əzələ–skelet sistemi': ['Osteoxondroz', 'Artroz', 'Artrit', 'Revmatoid artrit', 'Osteoporoz'],
-    'Həzm sistemi (mədə–bağırsaq)': ['Xroniki qastrit', 'Xora', 'Pankreatit', 'Qıcıqlanmış bağırsaq'],
-    'İmmun və autoimmun xəstəliklər': ['Psoriaz', 'Qurdeşənəyi', 'Kron', 'Çölyak'],
-    'Psixi pozuntular': ['Depressiya', 'Anksiyete', 'Bipolyar'],
-    'Qan və qan yaradan orqanlar': ['Anemiya', 'Talassemiya'],
-    'Böyrək və qaraciyər xəstəlikləri': ['Böyrək çatışmazlığı', 'Hepatit', 'Sirroz']
-  };
+  // const healthConditionCategories = [
+  //   'Ürək–damar sistemi', 'Tənəffüs sistemi', 'Endokrin və maddələr mübadiləsi',
+  //   'Sinir sistemi', 'Əzələ–skelet sistemi', 'Həzm sistemi (mədə–bağırsaq)',
+  //   'İmmun və autoimmun xəstəliklər', 'Psixi pozuntular',
+  //   'Qan və qan yaradan orqanlar', 'Böyrək və qaraciyər xəstəlikləri'
+  // ];
+
+  // const conditionsByCategory = {
+  //   'Ürək–damar sistemi': ['Arterial hipertenziya', 'İskemik ürək xəstəliyi', 'Ürək çatışmazlığı', 'Aritmiya', 'Ateroskleroz'],
+  //   'Tənəffüs sistemi': ['Bronxial astma', 'Xroniki bronxit', 'XOAX', 'Allergik rinit'],
+  //   'Endokrin və maddələr mübadiləsi': ['Şəkərli diabet', 'Hipotireoz', 'Hipertireoz', 'Piylənmə', 'Metabolik sindrom'],
+  //   'Sinir sistemi': ['Epilepsiya', 'Miqren', 'Parkinson', 'Dağınıq skleroz'],
+  //   'Əzələ–skelet sistemi': ['Osteoxondroz', 'Artroz', 'Artrit', 'Revmatoid artrit', 'Osteoporoz'],
+  //   'Həzm sistemi (mədə–bağırsaq)': ['Xroniki qastrit', 'Xora', 'Pankreatit', 'Qıcıqlanmış bağırsaq'],
+  //   'İmmun və autoimmun xəstəliklər': ['Psoriaz', 'Qurdeşənəyi', 'Kron', 'Çölyak'],
+  //   'Psixi pozuntular': ['Depressiya', 'Anksiyete', 'Bipolyar'],
+  //   'Qan və qan yaradan orqanlar': ['Anemiya', 'Talassemiya'],
+  //   'Böyrək və qaraciyər xəstəlikləri': ['Böyrək çatışmazlığı', 'Hepatit', 'Sirroz']
+  // };
 
   const validatePassword = (value) => {
     const hasLength = value.length >= 8;
@@ -58,54 +63,144 @@ function RegisterPage({ onSwitchToLogin }) {
     if (isValid) setShowPasswordRules(false);
   };
 
-  const getAvailableConditions = () => conditionCategory ? conditionsByCategory[conditionCategory] || [] : [];
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Şifrələr eyni deyil!");
-      return;
-    }
+ 
+//   const handleSubmit = async (e) => {
+//     if (!selectedConditionId) {
+//   alert("Zəhmət olmasa xəstəlik seçin!");
+//   return;
+// }
 
-    // 🔴 Şifrə qaydalara uyğun deyilsə stop
-    if (!passwordValid) {
-      alert("Şifrə tələblərə uyğun deyil!");
-      return;
-    }
+// if (!severity) {
+//   alert("Zəhmət olmasa ağırlıq dərəcəsini seçin!");
+//   return;
+// }
+//     e.preventDefault();
+//     if (password !== confirmPassword) {
+//       alert("Şifrələr eyni deyil!");
+//       return;
+//     }
 
+//     // 🔴 Şifrə qaydalara uyğun deyilsə stop
+//     if (!passwordValid) {
+//       alert("Şifrə tələblərə uyğun deyil!");
+//       return;
+//     }
+
+//     const payload = {
+//       fullName,
+//       email,
+//       password,
+//       dateOfBirth,
+
+//       gender: gender.toLowerCase(),
+//       height: Number(height),
+//       weight: Number(weight),
+//       // conditionId: 1,
+//       // severity: "mild"
+//       conditionId: Number(selectedConditionId),
+// severity: severity,
+//     };
+
+//     try {
+//       const res = await fetch(`${API_BASE_URL}/auth/register`, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(payload)
+//       });
+
+//       const data = await res.json();
+
+//       if (!res.ok) {
+//         throw new Error(data.message || "Qeydiyyat uğursuz oldu");
+//       }
+
+//       console.log("REGISTER SUCCESS:", data);
+
+//       navigate("/login");
+//     } catch (err) {
+//       console.error("REGISTER ERROR:", err);
+//       alert(err.message);
+//     }
+//   };
+  const severityMap = {
+  mild: "MILD",
+  moderate: "MODERATE",
+  severe: "SEVERE"
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!selectedConditionId) {
+    alert("Zəhmət olmasa xəstəlik seçin!");
+    return;
+  }
+
+  if (!severity) {
+    alert("Zəhmət olmasa ağırlıq dərəcəsini seçin!");
+    return;
+  }
+
+  if (password !== confirmPassword) {
+    alert("Şifrələr eyni deyil!");
+    return;
+  }
+
+  if (!passwordValid) {
+    alert("Şifrə tələblərə uyğun deyil!");
+    return;
+  }
+
+  try {
     const payload = {
       fullName,
       email,
       password,
       dateOfBirth,
-
-      gender: gender.toLowerCase(),
+      gender,
       height: Number(height),
       weight: Number(weight),
-      conditionId: 1,
-      severity: "mild"
+      conditionId: Number(selectedConditionId),
+      severity: severityMap[severity]
     };
 
+    console.log("PAYLOAD:", payload);
+
+    const res = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    console.log("BACKEND RESPONSE:", data);
+
+    if (!res.ok) {
+      throw new Error(data.message || "Qeydiyyat uğursuz oldu");
+    }
+
+    alert("Qeydiyyat uğurla tamamlandı!");
+    navigate("/login");
+
+  } catch (err) {
+    console.error("REGISTER ERROR:", err);
+    alert(err.message);
+  }
+};
+useEffect(() => {
+  const fetchConditions = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
+      const res = await fetch(`${API_BASE_URL}/conditions`);
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Qeydiyyat uğursuz oldu");
-      }
-
-      console.log("REGISTER SUCCESS:", data);
-
-      navigate("/login");
+            console.log("CONDITIONS DATA:", data);
+      setCategories(data); // ÇÜNKİ data artıq array-dir
     } catch (err) {
-      console.error("REGISTER ERROR:", err);
-      alert(err.message);
+      console.error("Conditions error:", err);
     }
   };
+
+  fetchConditions();
+}, []);
   //  if (loading) {
   //   return (
   //     <div className="flex items-center justify-center h-96">
@@ -371,10 +466,14 @@ function RegisterPage({ onSwitchToLogin }) {
                   <select
                     value={conditionCategory}
                     onChange={e => setConditionCategory(e.target.value)}
-                    className="w-full h-[60px] pl-12 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white appearance-none cursor-pointer text-slate-500"
+                    className="w-full h-[60px] pl-12 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white appearance-none cursor-pointer text-slate-500 relative z-10"
                   >
                     <option value="">Xəstəlik kateqoriyanızı seçin</option>
-                    {healthConditionCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                   {categories.map((category) => (
+  <option key={category.id} value={category.id}>
+    {category.name}
+  </option>
+))}
                   </select>
                   <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                     <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -391,7 +490,7 @@ function RegisterPage({ onSwitchToLogin }) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                   </div>
-                  <select
+                  {/* <select
                     value={condition}
                     onChange={e => setCondition(e.target.value)}
                     className="w-full h-[60px] pl-12 pr-10 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all bg-white appearance-none cursor-pointer text-slate-500"
@@ -399,8 +498,23 @@ function RegisterPage({ onSwitchToLogin }) {
                   >
                     <option value="">Xəstəliyinizi seçin</option>
                     {getAvailableConditions().map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  </select> */}
+         <select
+  value={selectedConditionId}
+  onChange={(e) => setSelectedConditionId(e.target.value)}
+  disabled={!conditionCategory}
+  className="w-full h-[60px] pl-12 pr-10 py-3 border border-slate-200 rounded-xl bg-white relative z-10"
+>
+  <option value="">Xəstəlik seçin</option>
 
+  {categories
+    .find(cat => String(cat.id) === conditionCategory)
+    ?.conditions.map((condition) => (
+      <option key={condition.id} value={condition.id}>
+        {condition.name}
+      </option>
+  ))}
+</select>
 
 
                   <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">

@@ -167,7 +167,7 @@
 
 
 import { ShoppingCart, Download, Check } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // API response format:
 // shoppingList = {
@@ -199,32 +199,59 @@ const MEALS = [
 ];
 
 // onDayChange(dayKey) — MealPlansPage-dən yeni shopping list fetch edir
-function ShoppingListCard({ shoppingList, onUpdateItems, onExport, onDayChange }) {
-  const [selectedDay,  setSelectedDay]  = useState(DAYS[0].key);
+function ShoppingListCard({ shoppingList, onUpdateItems, onExport, onDayChange,initialDay  }) {
+ const [currentDay, setCurrentDay] = useState(initialDay || DAYS[0].key);
   const [selectedMeal, setSelectedMeal] = useState(MEALS[0].key);
 
-  const categories = shoppingList?.categories || [];
+    const categories = shoppingList?.categories || [];
   const allItems   = categories.flatMap((cat) => cat.items || []);
-
+  
+  useEffect(() => {
+    if (initialDay) setCurrentDay(initialDay);
+  }, [initialDay]);
+ 
   // Seçilmiş yeməyə görə filter (gün artıq backend-dən gəlir)
-  const filteredCategories = categories
-    .map((cat) => ({
-      ...cat,
-      items: (cat.items || []).filter(
-        (item) => !item.mealType || item.mealType === selectedMeal
-      ),
-    }))
-    .filter((cat) => cat.items.length > 0);
-
-  const filteredItems = filteredCategories.flatMap((cat) => cat.items);
-  const checkedCount  = filteredItems.filter((i) => i.checked).length;
-
-  const handleDayClick = (dayKey) => {
-    setSelectedDay(dayKey);
-    if (onDayChange) onDayChange(dayKey); // ← backend-dən yeni list fetch edir
-  };
+  // const filteredCategories = categories
+  //   .map((cat) => ({
+  //     ...cat,
+  //     items: (cat.items || []).filter(
+  //       (item) => !item.mealType || item.mealType === selectedMeal
+  //     ),
+  //   }))
+  //   .filter((cat) => cat.items.length > 0);
+  // const filteredCategories = categories
+  //   .map((cat) => ({
+  //     ...cat,
+  //     items: (cat.items || []).filter(
+  //       (item) => item.day === currentDay && (!item.mealType || item.mealType === selectedMeal)
+  //     ),
+  //   }))
+  //   .filter((cat) => cat.items.length > 0);
+// const filteredCategories = categories
+//   .map((cat) => ({
+//     ...cat,
+//     items: (cat.items || []).filter(
+//       (item) => !item.mealType || item.mealType === selectedMeal
+//     ),
+//   }))
+//   .filter((cat) => cat.items.length > 0);
+  // const handleDayClick = (dayKey) => {
+  //   setSelectedDay(dayKey);
+  //   if (onDayChange) onDayChange(dayKey); // ← backend-dən yeni list fetch edir
+  // };
 
   // ── PUT /shopping-lists/{id}/items ────────────────────────────────
+  const filteredCategories = categories
+  .map((cat) => ({
+    ...cat,
+    items: cat.items || [],  // heç bir filter yoxdur
+  }))
+  .filter((cat) => cat.items.length > 0);
+  const handleDayClick = (dayKey) => {
+    setCurrentDay(dayKey);
+    if (onDayChange) onDayChange(dayKey);
+  };
+
   const handleToggleItem = (itemId, currentChecked) => {
     const updated = allItems.map((item) =>
       item.id === itemId ? { ...item, checked: !currentChecked } : item
@@ -237,9 +264,12 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport, onDayChange }
       }))
     );
   };
-
-  const selectedDayLabel  = DAYS.find((d) => d.key === selectedDay)?.label  || "";
+ const filteredItems = filteredCategories.flatMap((cat) => cat.items);
+  const checkedCount  = filteredItems.filter((i) => i.checked).length;
+const currentDayLabel  = DAYS.find((d) => d.key === currentDay)?.label || "";
   const selectedMealLabel = MEALS.find((m) => m.key === selectedMeal)?.label || "";
+
+
 
   return (
     <div className="!bg-white !rounded-3xl !shadow-xl mt-12 overflow-hidden">
@@ -269,7 +299,7 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport, onDayChange }
               key={d.key}
               onClick={() => handleDayClick(d.key)}
               className={`flex-1 !py-2 !rounded-lg !text-xs sm:!text-sm !font-medium !transition whitespace-nowrap
-                ${selectedDay === d.key
+                ${currentDay === d.key
                   ? "!bg-white !shadow !text-blue-600"
                   : "!text-slate-500"}`}
             >
@@ -352,15 +382,15 @@ function ShoppingListCard({ shoppingList, onUpdateItems, onExport, onDayChange }
         </button>
 
         <button
-          onClick={() => onExport(selectedDay)}
+          onClick={() => onExport(currentDay)}
           disabled={!shoppingList}
           className="!bg-blue-600 text-white py-3 rounded-xl shadow hover:!bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-40 text-sm font-medium"
         >
-          <Download size={15} /> {selectedDayLabel} İxrac Et
+          <Download size={15} /> {currentDayLabel} İxrac Et
         </button>
 
         <button
-          onClick={() => onExport(selectedDay)}
+          onClick={() => onExport(selectedMeal)}
           disabled={!shoppingList}
           className="!bg-blue-600 text-white py-3 rounded-xl shadow hover:!bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-40 text-sm font-medium"
         >
