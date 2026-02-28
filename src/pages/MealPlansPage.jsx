@@ -366,7 +366,8 @@ function MealPlansPage() {
       attempts++;
       try {
         const res = await fetch(
-          `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}`,
+          `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}&force=false`,
+          // `${API_BASE_URL}/meal-plans/current`,
           { headers: { Authorization: `Bearer ${getToken()}` } }
         );
 
@@ -403,7 +404,8 @@ function MealPlansPage() {
 
       try {
         const res = await fetch(
-          `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}`,
+          `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}&force=false`,
+          // `${API_BASE_URL}/meal-plans/current`,
           { headers: { Authorization: `Bearer ${getToken()}` } }
         );
 
@@ -467,7 +469,8 @@ if (res.ok) {
  
     try {
       const res = await fetch(
-        `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}&force=true`,
+        `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}&force=false`,
+        // `${API_BASE_URL}/meal-plans/current`,
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
 
@@ -542,7 +545,8 @@ await fetchShoppingList(weekStart);
       // Yenidən fetch et
       const weekStart = getWeekStart();
       const refreshed = await fetch(
-        `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}`,
+        `${API_BASE_URL}/meal-plans/ai?weekStart=${weekStart}&force=false`,
+        // `${API_BASE_URL}/meal-plans/current`,
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
       if (refreshed.ok) setMealPlan(await refreshed.json());
