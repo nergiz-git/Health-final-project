@@ -515,11 +515,16 @@ useEffect(() => {
                       onChange={(e) => setEditedUser({ ...editedUser, conditionCategory: e.target.value })}
                       className="w-full text-[14px] font-semibold h-8 px-2 py-1 border border-slate-300 rounded-md bg-white"
                     >
-                      {healthConditionCategories.map((category) => (
+                      {/* {healthConditionCategories.map((category) => (
                         <option key={category} value={category}>
                           {category}
                         </option>
-                      ))}
+                      ))} */}
+                      {categories.map((category) => (
+  <option key={category.id} value={category.name}>
+    {category.name}
+  </option>
+))}
                     </select>
                   ) : (
                     <div className="text-[14px] text-slate-900 font-semibold">
