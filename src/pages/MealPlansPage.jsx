@@ -597,45 +597,162 @@ if (res.ok) {
   };
 
   // ── GET /meal-plans/{id}/export ───────────────────────────────────
-  const handleExportMealPlan = async (dayKey = null) => {
-    if (!mealPlan?.id) return alert("Plan mövcud deyil");
-    try {
-      const url = `${API_BASE_URL}/meal-plans/${mealPlan.id}/export${dayKey ? `?day=${dayKey}` : ""}`;
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      if (!res.ok) throw new Error("İxrac uğursuz oldu");
-      const blob = await res.blob();
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = dayKey ? `meal-plan-${dayKey}.pdf` : "meal-plan-weekly.pdf";
-      link.click();
-    } catch (err) {
-      console.error("EXPORT MEAL PLAN ERROR:", err);
-      alert(err.message);
-    }
-  };
+  // const handleExportMealPlan = async (dayKey = null) => {
+  //   if (!mealPlan?.id) return alert("Plan mövcud deyil");
+  //   try {
+  //     const url = `${API_BASE_URL}/meal-plans/${mealPlan.id}/export${dayKey ? `?day=${dayKey}` : ""}`;
+  //     const res = await fetch(url, {
+  //       headers: { Authorization: `Bearer ${getToken()}` },
+  //     });
+  //     if (!res.ok) throw new Error("İxrac uğursuz oldu");
+  //     const blob = await res.blob();
+  //     const link = document.createElement("a");
+  //     link.href = URL.createObjectURL(blob);
+  //     link.download = dayKey ? `meal-plan-${dayKey}.pdf` : "meal-plan-weekly.pdf";
+  //     link.click();
+  //   } catch (err) {
+  //     console.error("EXPORT MEAL PLAN ERROR:", err);
+  //     alert(err.message);
+  //   }
+  // };
+//   const handleExportMealPlan = async (dayKey = null) => {
+//   if (!mealPlan?.id) return alert("Plan mövcud deyil");
+//   try {
+//     const url = `${API_BASE_URL}/meal-plans/${mealPlan.id}/export${dayKey ? `?day=${dayKey}` : ""}`;
+//     const res = await fetch(url, {
+//       headers: { Authorization: `Bearer ${getToken()}` },
+//     });
+//     if (!res.ok) throw new Error("İxrac uğursuz oldu");
+    
+//     const text = await res.text();
+//     console.log("MEAL PLAN EXPORT:", text); // ← bunu mənə göstər
+    
+//   } catch (err) {
+//     console.error("EXPORT MEAL PLAN ERROR:", err);
+//     alert(err.message);
+//   }
+// };
+const handleExportMealPlan = async (dayKey = null) => {
+  if (!mealPlan?.id) return alert("Plan mövcud deyil");
+  try {
+    const url = `${API_BASE_URL}/meal-plans/${mealPlan.id}/export?format=pdf${dayKey ? `&day=${dayKey}` : ""}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    if (!res.ok) throw new Error("İxrac uğursuz oldu");
 
+    const blob = await res.blob();
+    const objectUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = dayKey ? `meal-plan-${dayKey}.pdf` : "meal-plan-weekly.pdf";
+    a.click();
+    window.URL.revokeObjectURL(objectUrl);
+  } catch (err) {
+    console.error("EXPORT MEAL PLAN ERROR:", err);
+    alert(err.message);
+  }
+};
   // ── GET /shopping-lists/{id}/export ──────────────────────────────
-  const handleExportShoppingList = async (dayKey = null) => {
-    if (!shoppingList?.id) return alert("Siyahı mövcud deyil");
-    try {
-      const url = `${API_BASE_URL}/shopping-lists/${shoppingList.id}/export${dayKey ? `?day=${dayKey}` : ""}`;
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      if (!res.ok) throw new Error("İxrac uğursuz oldu");
-      const blob = await res.blob();
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf";
-      link.click();
-    } catch (err) {
-      console.error("EXPORT SHOPPING LIST ERROR:", err);
-      alert(err.message);
-    }
-  };
+  // const handleExportShoppingList = async (dayKey = null) => {
+  //   if (!shoppingList?.id) return alert("Siyahı mövcud deyil");
+  //   try {
+  //     const url = `${API_BASE_URL}/shopping-lists/${shoppingList.id}/export${dayKey ? `?day=${dayKey}` : ""}`;
+  //     const res = await fetch(url, {
+  //       headers: { Authorization: `Bearer ${getToken()}` },
+  //     });
+  //     if (!res.ok) throw new Error("İxrac uğursuz oldu");
+  //     const blob = await res.blob();
+  //     const link = document.createElement("a");
+  //     link.href = URL.createObjectURL(blob);
+  //     link.download = dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf";
+  //     link.click();
+  //   } catch (err) {
+  //     console.error("EXPORT SHOPPING LIST ERROR:", err);
+  //     alert(err.message);
+  //   }
+  // };
+// const handleExportShoppingList = async (dayKey = null) => {
+//   if (!shoppingList?.id) return alert("Siyahı mövcud deyil");
+//   try {
+//     const url = `${API_BASE_URL}/shopping-lists/${shoppingList.id}/export${dayKey ? `?day=${dayKey}` : ""}`;
+//     const res = await fetch(url, {
+//       headers: { Authorization: `Bearer ${getToken()}` },
+//     });
+    
+//     if (!res.ok) throw new Error("İxrac uğursuz oldu");
 
+//     // ── DEBUG: backend nə qaytarır? ──────────────────
+//     const contentType = res.headers.get("content-type");
+//     console.log("Content-Type:", contentType);         // application/pdf olmalıdır
+    
+//     const blob = await res.blob();
+//     console.log("Blob size:", blob.size);              // 0 olmamalıdır
+//     console.log("Blob type:", blob.type);              // application/pdf olmalıdır
+//     // ─────────────────────────────────────────────────
+
+//     if (blob.size === 0) {
+//       alert("Backend boş fayl qaytardı!");
+//       return;
+//     }
+
+//     const link = document.createElement("a");
+//     link.href = URL.createObjectURL(blob);
+//     link.download = dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf";
+//     link.click();
+//   } catch (err) {
+//     console.error("EXPORT SHOPPING LIST ERROR:", err);
+//     alert(err.message);
+//   }
+// };
+
+// const handleExportShoppingList = async (dayKey = null) => {
+//   if (!shoppingList?.id) return alert("Siyahı mövcud deyil");
+//   try {
+//     const url = `${API_BASE_URL}/shopping-lists/${shoppingList.id}/export${dayKey ? `?day=${dayKey}` : ""}`;
+//     const res = await fetch(url, {
+//       headers: { Authorization: `Bearer ${getToken()}` },
+//     });
+
+//     if (!res.ok) throw new Error("İxrac uğursuz oldu");
+
+//     const contentType = res.headers.get("content-type");
+//     console.log("Content-Type:", contentType);
+
+//     const blob = await res.blob();
+//     console.log("Blob size:", blob.size);
+//     console.log("İlk bytes:", await blob.slice(0, 4).text()); // %PDF gəlməlidir
+
+//     const link = document.createElement("a");
+//     link.href = URL.createObjectURL(blob);
+//     link.download = dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf";
+//     link.click();
+//   } catch (err) {
+//     console.error("EXPORT SHOPPING LIST ERROR:", err);
+//     alert(err.message);
+//   }
+// };
+const handleExportShoppingList = async (dayKey = null) => {
+  if (!shoppingList?.id) return alert("Siyahı mövcud deyil");
+  try {
+    const url = `${API_BASE_URL}/shopping-lists/${shoppingList.id}/export?format=pdf${dayKey ? `&day=${dayKey}` : ""}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    if (!res.ok) throw new Error("İxrac uğursuz oldu");
+
+    const blob = await res.blob();
+    const objectUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf";
+    a.click();
+    window.URL.revokeObjectURL(objectUrl);
+  } catch (err) {
+    console.error("EXPORT SHOPPING LIST ERROR:", err);
+    alert(err.message);
+  }
+};
   const handleEditClick = (day) => {
     setSelectedDay(day);
     setIsEditModalOpen(true);
