@@ -375,25 +375,48 @@ function MedicationsPage() {
   };
 
   // 🗑 DELETE
+  // const deleteMedication = async (id) => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const res = await fetch(`${API_BASE_URL}/medications/${id}`, {
+  //       method: "DELETE",
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+
+  //     if (!res.ok) {
+  //       const text = await res.text();
+  //       console.log("BACKEND DELETE RESPONSE:", text);
+  //       throw new Error("Delete failed");
+  //     }
+
+  //     setMedications((prev) => prev.filter((m) => m.id !== id));
+  //   } catch (err) {
+  //     console.error("Delete error:", err);
+  //   }
+  // };
   const deleteMedication = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${API_BASE_URL}/medications/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  const confirmDelete = window.confirm("Dərmanı silmək istədiyinizdən əminsiniz?");
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.log("BACKEND DELETE RESPONSE:", text);
-        throw new Error("Delete failed");
-      }
+  if (!confirmDelete) return; // Cancel edərsə dayandır
 
-      setMedications((prev) => prev.filter((m) => m.id !== id));
-    } catch (err) {
-      console.error("Delete error:", err);
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${API_BASE_URL}/medications/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.log("BACKEND DELETE RESPONSE:", text);
+      throw new Error("Delete failed");
     }
-  };
+
+    setMedications((prev) => prev.filter((m) => m.id !== id));
+  } catch (err) {
+    console.error("Delete error:", err);
+  }
+};
 if (loading) {
   return (
     <div className="flex items-center justify-center h-96">

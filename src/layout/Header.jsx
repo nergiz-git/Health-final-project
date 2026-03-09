@@ -21,7 +21,7 @@ export function Header({ user, onLogout }) {
       </div>
 
 
-      <div className="flex items-center gap-6">
+      {/* <div className="flex items-center gap-6">
         
 
         <div className="flex items-center gap-2 text-[14px] font-medium">
@@ -35,7 +35,7 @@ export function Header({ user, onLogout }) {
         <div className="text-[14px] font-medium  hidden lg:block ">
           {currentTime.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('.')}
         </div>
-      </div>
+      </div> */}
     </header>
   );
 }

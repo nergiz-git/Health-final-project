@@ -570,20 +570,49 @@ import { Label } from "../ui/Label";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function AddMedicationModal({ isOpen, onClose, onAdd }) {
-  const initialForm = {
-    name: "",
-    dose: "",
-    time: "",
-    frequency: "",
-    note: "",
-    intakeCondition: "",
-  };
-
+  // const initialForm = {
+  //   name: "",
+  //   dose: "",
+  //   time: "",
+  //   frequency: "",
+  //   note: "",
+  //   intakeCondition: "",
+  // };
+const initialForm = {
+  name: "",
+  dose: "",
+  times: [""],
+  frequency: "",
+  note: "",
+  intakeCondition: "",
+};
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+const addTimeField = () => {
+  setFormData((prev) => ({
+    ...prev,
+    times: [...prev.times, ""],
+  }));
+};
 
+const removeTimeField = (index) => {
+  setFormData((prev) => ({
+    ...prev,
+    times: prev.times.filter((_, i) => i !== index),
+  }));
+};
+
+const updateTime = (index, value) => {
+  const newTimes = [...formData.times];
+  newTimes[index] = value;
+
+  setFormData({
+    ...formData,
+    times: newTimes,
+  });
+};
   useEffect(() => {
     if (isOpen) {
       setFormData(initialForm);
@@ -599,7 +628,7 @@ function AddMedicationModal({ isOpen, onClose, onAdd }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.dose || !formData.time || !formData.frequency) {
+    if (!formData.name || !formData.dose || !formData.times || !formData.frequency) {
       setError("Zəruri sahələri doldurun!");
       return;
     }
@@ -616,14 +645,22 @@ function AddMedicationModal({ isOpen, onClose, onAdd }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        // body: JSON.stringify({
+        //   name: formData.name,
+        //   dose: formData.dose,
+        //   time: formData.time,
+        //   frequency: formData.frequency,
+        //   notes: formData.note,
+        //   intakeCondition: formData.intakeCondition,
+        // }),
         body: JSON.stringify({
-          name: formData.name,
-          dose: formData.dose,
-          time: formData.time,
-          frequency: formData.frequency,
-          notes: formData.note,
-          intakeCondition: formData.intakeCondition,
-        }),
+  name: formData.name,
+  dose: formData.dose,
+  time: formData.times.join(", "),  // 👈 bütün saatlar birləşir
+  frequency: formData.frequency,
+  notes: formData.note,
+  intakeCondition: formData.intakeCondition,
+}),
       });
 
       if (!res.ok) {
@@ -651,6 +688,7 @@ function AddMedicationModal({ isOpen, onClose, onAdd }) {
     resetForm();
     onClose();
   };
+  
 
   if (!isOpen) return null;
 
@@ -698,95 +736,73 @@ function AddMedicationModal({ isOpen, onClose, onAdd }) {
 
 
 
+{/* <div className="space-y-2">
+  <Label className={"text-black"}>Vaxt *</Label>
 
-          <div className="space-y-2 relative">
-            <Label className={"text-black"}>Vaxt *</Label>
-            <div className="relative">
-              <div className="w-full h-11 bg-[#F3F3F5] border-none rounded px-4 flex items-center justify-between">
-                <span className="text-slate-500">{formData.time || "--:-- --"}</span>
-                <button
-                  type="button"
-                  onClick={() => setShowTimePicker(!showTimePicker)}
-                  className="!bg-transparent border-none outline-none mr-[180px] shadow-none p-0 m-0"
-                  disabled={loading}
-                >
-                  <Clock size={18} className="text-slate-500" />
-                </button>
-              </div>
+  {formData.times.map((time, index) => (
+    <div key={index} className="flex gap-2 items-center">
 
-              {showTimePicker && (
-                <div className="absolute top-12 left-0 bg-white border shadow-lg p-3 flex h-[280px] z-50 w-[150px]">
-                  {/* HOURS */}
-                  <div className="overflow-y-scroll no-scrollbar w-10">
-                    {Array.from({ length: 12 }, (_, i) => {
-                      const hour = String(i + 1).padStart(2, "0");
-                      return (
-                        <div
-                          key={hour}
-                          onClick={() =>
-                            setFormData(prev => {
-                              const minute = prev.time?.split(":")[1]?.split(" ")[0] || "00";
-                              const period = prev.time?.split(" ")[1] || "AM";
-                              return { ...prev, time: `${hour}:${minute} ${period}` };
-                            })
-                          }
-                          className="py-2 text-center cursor-pointer hover:bg-gray-200"
-                        >
-                          {hour}
-                        </div>
-                      );
-                    })}
-                  </div>
+      <input
+        type="time"
+        value={time}
+        onChange={(e) => updateTime(index, e.target.value)}
+        className="w-full h-10 bg-[#F3F3F5] rounded px-3"
+      />
 
-                  {/* MINUTES */}
-                  <div className="overflow-y-scroll no-scrollbar w-10">
-                    {Array.from({ length: 60 }, (_, i) => {
-                      const min = String(i).padStart(2, "0");
-                      return (
-                        <div
-                          key={min}
-                          onClick={() =>
-                            setFormData(prev => {
-                              const hour = prev.time?.split(":")[0] || "08";
-                              const period = prev.time?.split(" ")[1] || "AM";
-                              return { ...prev, time: `${hour}:${min} ${period}` };
-                            })
-                          }
-                          className="py-2 text-center cursor-pointer hover:bg-gray-200"
-                        >
-                          {min}
-                        </div>
-                      );
-                    })}
-                  </div>
+      {index !== 0 && (
+        <button
+          type="button"
+          onClick={() => removeTimeField(index)}
+          className="text-red-500"
+        >
+          Sil
+        </button>
+      )}
+    </div>
+  ))}
 
-                  {/* AM/PM */}
-                  <div className="h-40 w-10 flex flex-col">
-                    {["AM", "PM"].map(period => (
-                      <div
-                        key={period}
-                        onClick={() =>
-                          setFormData(prev => {
-                            const hour = prev.time?.split(":")[0] || "08";
-                            const minute = prev.time?.split(":")[1]?.split(" ")[0] || "00";
-                            return { ...prev, time: `${hour}:${minute} ${period}` };
-                          })
-                        }
-                        className="py-2 text-center cursor-pointer hover:bg-gray-200"
-                      >
-                        {period}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+  <button
+    type="button"
+    onClick={addTimeField}
+    className="text-blue-600 text-sm"
+  >
+    + Vaxt əlavə et
+  </button>
+</div> */}
+<div className="space-y-2">
+  <div className="flex items-center justify-between">
+    <Label className={"text-black"}>Vaxt *</Label>
+    <button
+      type="button"
+      onClick={addTimeField}
+      className="text-blue-600 text-sm"
+    >
+      + Vaxt əlavə et
+    </button>
+  </div>
 
+ {formData.times.map((time, index) => (
+  <div key={index} className="flex gap-2 items-center">
+    <input
+      type="time"
+      value={time}
+      onChange={(e) => updateTime(index, e.target.value)}
+      className="w-full h-10 bg-[#F3F3F5] rounded px-3"
+    />
 
-
-          </div>
-
-          <div className="space-y-2">
+    {formData.times.length > 1 && (
+      <button
+        type="button"
+        onClick={() => removeTimeField(index)}
+        className="text-red-500"
+      >
+        Sil
+      </button>
+    )}
+  </div>
+))}
+</div>
+      <div className="space-y-2">
             <Label className={"text-black"}>Tezlik *</Label>
             <Input
               className="bg-[#F3F3F5] border-none !text-slate-500"

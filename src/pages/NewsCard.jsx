@@ -167,11 +167,21 @@ const handleDelete = async (id) => {
     }
   };
 
-  const visibleNews = news.slice(0, visibleCount);
+  // const visibleNews = news.slice(0, visibleCount);
   
-
+const visibleNews = news.slice(0, visibleCount);
   return (
     <div>
+      
+    {news.length === 0 ? (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        {/* <div className="text-5xl mb-4">📰</div> */}
+        <h3 className="text-slate-700 font-semibold text-[30px] mb-2">Aktual xəbərlər yoxdur!</h3>
+        {/* <p className="text-slate-500 text-sm">Hal-hazırda göstəriləcək xəbər tapılmadı.</p> */}
+      </div>
+    ) : (
+      <>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {visibleNews.map((item) => (
           <div
@@ -260,6 +270,9 @@ const handleDelete = async (id) => {
           </button>
         </div>
       )}
+      
+ </>
+    )}
     </div>
   );
 }

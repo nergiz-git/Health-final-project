@@ -10,7 +10,7 @@ export function ThemeToggle() {
   return (
   <span
   onClick={() => setTheme(!theme)}
-  className="fixed top-5 right-[210px] p-3 cursor-pointer"
+  className="fixed top-5 right-[30px] p-3 cursor-pointer"
 >
   {theme ? <FaMoon size={18} /> : <FaSun size={18} />}
 </span>

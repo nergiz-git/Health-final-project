@@ -458,8 +458,7 @@ if (res.ok) {
         >
 
           <h2 className=" text-[16px] sm:text-[18px] lg:text-[20px] font-bold mb-4 sm:mb-6">
-            Bu Günün Cədvəli - {todaySchedule?.dayOfWeek || today}
-          </h2>
+            Bu Günün Cədvəli    </h2>
 
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-5 lg:p-6">
             {notifications.length === 0 ? (
