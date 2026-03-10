@@ -287,8 +287,12 @@ function MealPlansPage() {
   const [generating, setGenerating] = useState(false);
   const [polling, setPolling] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedDay, setSelectedDay] = useState("Mon");
-
+  // const [selectedDay, setSelectedDay] = useState("Mon");
+  const todayKey = () => {
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return days[new Date().getDay()];
+};
+const [selectedDay, setSelectedDay] = useState(todayKey());
   const pollRef = useRef(null);
 
   const getToken = () => localStorage.getItem("token");
@@ -491,7 +495,9 @@ if (res.ok) {
         setMealPlan(null);
       }
 
-      await fetchShoppingList(weekStart, "Mon");
+      // await fetchShoppingList(weekStart, "Mon");
+      await fetchShoppingList(weekStart, todayKey());
+
       setLoading(false);
     };
 

@@ -234,10 +234,10 @@
 
 
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Label } from "../ui/Label";
+import { X, Clock, Loader2, Trash2 } from "lucide-react";
 
 function EditMedicationModal({ medication, onClose, onUpdate }) {
   const [formData, setFormData] = useState({
@@ -355,9 +355,9 @@ function EditMedicationModal({ medication, onClose, onUpdate }) {
                   <button
                     type="button"
                     onClick={() => removeTimeField(index)}
-                    className="text-red-500"
+                    className="text-red-500 hover:text-red-600 transition-colors"
                   >
-                    Sil
+                     <Trash2 size={18} />
                   </button>
                 )}
               </div>

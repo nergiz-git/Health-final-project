@@ -562,10 +562,10 @@
 
 
 import { useState, useEffect } from "react";
-import { X, Clock, Loader2 } from "lucide-react";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Label } from "../ui/Label";
+import { X, Clock, Loader2, Trash2 } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -794,9 +794,9 @@ const updateTime = (index, value) => {
       <button
         type="button"
         onClick={() => removeTimeField(index)}
-        className="text-red-500"
+        className="text-red-500 hover:text-red-600 transition-colors"
       >
-        Sil
+        <Trash2 size={18} />
       </button>
     )}
   </div>
