@@ -320,6 +320,19 @@ function MedicationsPage() {
   const [editingMed, setEditingMed] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const formatTime = (timeStr) => {
+  if (!timeStr) return "";
+  return timeStr
+    .split(",")
+    .map((t) => {
+      const [h, m] = t.trim().split(":");
+      const hour = parseInt(h);
+      const ampm = hour >= 12 ? "PM" : "AM";
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${m} ${ampm}`;
+    })
+    .join(", ");
+};
   // ✅ Dərmanları backend-dən gətir
   const fetchMedications = useCallback(async () => {
     try {
@@ -503,7 +516,7 @@ if (loading) {
                   <div className="flex gap-6 text-sm text-slate-600 mt-1 flex-wrap">
                     <span className="flex items-center mt-[10px] gap-1">
                       <Clock size={16} />
-                      {med.time}
+                     {formatTime(med.time)}
                     </span>
 
                     <span className="flex items-center mt-[10px] gap-1">
