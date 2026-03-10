@@ -266,7 +266,7 @@ function EditMedicationModal({ medication, onClose, onUpdate }) {
             })
           : [""],
         frequency: medication.frequency || "",
-        note: medication.note || "",
+        note: medication.note || medication.notes || "",
         intakeCondition: medication.intakeCondition || "",
       });
     }

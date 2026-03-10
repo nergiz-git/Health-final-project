@@ -286,54 +286,54 @@ function DashboardPage() {
   const { user } = useOutletContext();
   const [todaySchedule, setTodaySchedule] = useState(null);
   const [loading, setLoading] = useState(true);
- let { theme } = useContext(MainContext)
+  let { theme } = useContext(MainContext)
   // ✅ Fetch today's schedule from backend
   useEffect(() => {
     fetchTodaySchedule();
   }, []);
 
   const fetchTodaySchedule = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    console.log('TOKEN:', token);
+    try {
+      const token = localStorage.getItem('token');
+      console.log('TOKEN:', token);
 
-    if (!token) {
-      console.error('No token found');
-      setLoading(false);
-      return;
-    }
-
-    const res = await fetch(`${API_BASE_URL}/home/today`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`
+      if (!token) {
+        console.error('No token found');
+        setLoading(false);
+        return;
       }
-    });
-const data = await res.json().catch(() => ({}));  // json parsing üçün
 
-if (res.ok) {
-  setTodaySchedule(data);
-} else {
-  // 🔹 Buraya yazırsan
-  console.error('Failed to fetch schedule', res.status, data);
-  setTodaySchedule({ items: [] });
-}
-    // const data = await res.json();
-    // console.log('TODAY SCHEDULE:', data);
+      const res = await fetch(`${API_BASE_URL}/home/today`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await res.json().catch(() => ({}));  // json parsing üçün
 
-    // if (res.ok) {
-    //   setTodaySchedule(data);
-    // } else {
-    //   console.error('Failed to fetch schedule', data);
-    //   setTodaySchedule({ items: [] });
-    // }
-  } catch (err) {
-    console.error('FETCH SCHEDULE ERROR:', err);
-    setTodaySchedule({ items: [] });
-  } finally {
-    setLoading(false);
-  }
-};
+      if (res.ok) {
+        setTodaySchedule(data);
+      } else {
+        // 🔹 Buraya yazırsan
+        console.error('Failed to fetch schedule', res.status, data);
+        setTodaySchedule({ items: [] });
+      }
+      // const data = await res.json();
+      // console.log('TODAY SCHEDULE:', data);
+
+      // if (res.ok) {
+      //   setTodaySchedule(data);
+      // } else {
+      //   console.error('Failed to fetch schedule', data);
+      //   setTodaySchedule({ items: [] });
+      // }
+    } catch (err) {
+      console.error('FETCH SCHEDULE ERROR:', err);
+      setTodaySchedule({ items: [] });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ✅ Map backend types to UI configuration
   const getItemConfig = (type) => {
@@ -387,6 +387,15 @@ if (res.ok) {
       return hours * 60 + (minutes || 0);
     }
   };
+
+  const formatTimeTo12h = (timeStr) => {
+  if (!timeStr) return "";
+  const [h, m] = timeStr.split(":");
+  const hour = parseInt(h);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${m} ${ampm}`;
+};
 
   const getCurrentTimeInMinutes = () => {
     const now = new Date();
@@ -467,7 +476,7 @@ if (res.ok) {
               </p>
             ) : (
               <div className="space-y-3">
-                {notifications.map((notification, index) => {
+                {/* {notifications.map((notification, index) => {
                   const config = getItemConfig(notification.type);
                   const IconComponent = config.icon;
                   const notificationTime = parseTime(notification.time);
@@ -540,6 +549,64 @@ if (res.ok) {
                             </span>
                           </div>
                         )}
+                      </div>
+                    </div>
+                  );
+                })} */}
+                {notifications.map((notification, index) => {
+                  const config = getItemConfig(notification.type);
+                  const IconComponent = config.icon;
+
+                  // Vaxtları ayır
+                  const times = notification.time
+                    ? notification.time.split(",").map((t) => t.trim())
+                    : [];
+
+                  return (
+                    <div
+                      key={`${notification.type}-${index}`}
+                      className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 p-4 rounded-xl border border-slate-200/80 hover:border-slate-300/80 hover:shadow-sm transition-all"
+                    >
+                      <div className={`p-2.5 ${config.iconBg} rounded-lg shrink-0`}>
+                        <IconComponent className={`w-5 h-5 ${config.iconColor}`} />
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-[15px] mb-0.5 text-slate-900">
+                          {notification.title}
+                        </div>
+                        {notification.subtitle && (
+                          <div className="text-[14px] text-slate-600 leading-relaxed">
+                            {notification.subtitle}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Hər vaxt üçün ayrı status */}
+                      <div className="flex flex-col gap-2 shrink-0 mt-2 sm:mt-0">
+                        {times.map((t, i) => {
+                          const isCompleted = parseTime(t) < currentTime;
+                          return (
+                            <div key={i} className="flex items-center gap-2">
+                              <div className="flex items-center gap-1.5 text-slate-500">
+                                <Clock className="w-4 h-4" />
+                               <span className="text-[13px] font-semibold">{formatTimeTo12h(t)}</span>
+
+                              </div>
+                              {isCompleted ? (
+                                <div className="flex items-center gap-1.5 text-green-600 bg-green-50 px-2.5 py-1 rounded-lg">
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  <span className="text-[12px] font-semibold">Göndərilib</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg">
+                                  <Clock className="w-4 h-4" />
+                                  <span className="text-[12px] font-semibold">Gözləyir</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );

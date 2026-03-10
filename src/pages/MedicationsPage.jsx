@@ -534,13 +534,13 @@ if (loading) {
                 </div>
               </div>
 
-              {med.note && (
-                <div className="bg-gray-100 rounded-xl mt-4 sm:ml-[65px] px-4 py-3 text-gray-600 text-sm">
-                  {med.note}
+              {(med.note || med.notes) && (
+                <div className="bg-gray-100 rounded-xl sm:ml-[65px] px-4 py-3 text-gray-600 text-sm">
+                   {med.note || med.notes}
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setEditingMed(med)}
                   className="flex w-full sm:w-[200px] sm:ml-[65px] items-center gap-1 bg-white border !border-blue-600 px-3 py-1 rounded-lg text-blue-600 justify-center transition-colors duration-200 hover:!bg-blue-100 hover:text-black"
