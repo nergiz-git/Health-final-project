@@ -726,7 +726,7 @@ const updateTime = (index, value) => {
           <div className="space-y-2">
             <Label className={"text-black"}>Doza *</Label>
             <Input
-              className="bg-[#F3F3F5] border-none Qtext-slate-500"
+              className="bg-[#F3F3F5] border-none !text-slate-500"
               placeholder="məs: 500mg"
               value={formData.dose}
               onChange={(e) => setFormData({ ...formData, dose: e.target.value })}

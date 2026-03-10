@@ -388,15 +388,27 @@ function DashboardPage() {
     }
   };
 
-  const formatTimeTo12h = (timeStr) => {
+//   const formatTimeTo12h = (timeStr) => {
+//   if (!timeStr) return "";
+//   const [h, m] = timeStr.split(":");
+//   const hour = parseInt(h);
+//   const ampm = hour >= 12 ? "PM" : "AM";
+//   const hour12 = hour % 12 || 12;
+//   return `${hour12}:${m} ${ampm}`;
+// };
+const formatTimeTo12h = (timeStr) => {
   if (!timeStr) return "";
+  
+  // Artıq AM/PM varsa, olduğu kimi qaytar
+  if (timeStr.includes("AM") || timeStr.includes("PM")) return timeStr;
+  
+  // 24-saatlıq formatı çevir
   const [h, m] = timeStr.split(":");
   const hour = parseInt(h);
   const ampm = hour >= 12 ? "PM" : "AM";
   const hour12 = hour % 12 || 12;
   return `${hour12}:${m} ${ampm}`;
 };
-
   const getCurrentTimeInMinutes = () => {
     const now = new Date();
     return now.getHours() * 60 + now.getMinutes();
