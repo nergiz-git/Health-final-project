@@ -314,23 +314,44 @@ const arrayBufferToBase64 = (buffer) => {
 };
   // ── GET /shopping-lists?weekStart=...&dayOfWeek=... ───────────────
   // dayOfWeek ötürülməsə həftəlik hamısı gəlir
-  const fetchShoppingList = async (weekStart, dayOfWeek = null) => {
-    try {
-      const url = dayOfWeek
-        ? `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}&dayOfWeek=${dayOfWeek}`
-        : `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}`;
+  // const fetchShoppingList = async (weekStart, dayOfWeek = null) => {
+  //   try {
+  //     const url = dayOfWeek
+  //       ? `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}&dayOfWeek=${dayOfWeek}`
+  //       : `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}`;
 
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      if (res.ok) setShoppingList(await res.json());
-      else setShoppingList(null);
-    } catch (err) {
-      console.error("FETCH SHOPPING LIST ERROR:", err);
-      setShoppingList(null);
+  //     const res = await fetch(url, {
+  //       headers: { Authorization: `Bearer ${getToken()}` },
+  //     });
+  //     if (res.ok) setShoppingList(await res.json());
+      
+  //     else setShoppingList(null);
+  //   } catch (err) {
+  //     console.error("FETCH SHOPPING LIST ERROR:", err);
+      
+  //     setShoppingList(null);
+  //   }
+  // };
+const fetchShoppingList = async (weekStart, dayOfWeek = null) => {
+  try {
+    const url = dayOfWeek
+      ? `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}&dayOfWeek=${dayOfWeek}`
+      : `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}`;
+
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      console.log("ITEMS SAMPLE:", data?.categories?.[0]?.items?.[0]); // ← buraya
+      setShoppingList(data);
     }
-  };
-
+    else setShoppingList(null);
+  } catch (err) {
+    console.error("FETCH SHOPPING LIST ERROR:", err);
+    setShoppingList(null);
+  }
+};
   // ── Polling məntiqi ───────────────────────────────────────────────
   // const startPolling = (weekStart) => {
   //   setPolling(true);
@@ -629,167 +650,7 @@ if (res.ok) {
 //     alert(err.message);
 //   }
 // };
-//  const handleExportMealPlan = async (dayKey = null) => {
-//   if (!mealPlan) return alert("Plan mövcud deyil");
 
-//   const doc = new jsPDF();
-
-//   try {
-//     // Font yüklə
-//     const fontUrl = "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Regular.ttf";
-//     const fontBytes = await fetch(fontUrl).then(r => r.arrayBuffer()); // ← bu sətir çatışmırdı
-//    const fontBase64 = arrayBufferToBase64(fontBytes);
-//     doc.addFileToVFS("Roboto.ttf", fontBase64);
-//     doc.addFont("Roboto.ttf", "Roboto", "normal");
-//     doc.setFont("Roboto");
-
-//     // Başlıq
-//     doc.setFontSize(18);
-//     doc.text("Qidalanma Planı", 20, 20);
-
-//     // Tarix
-//     doc.setFontSize(11);
-//     doc.setTextColor(150);
-//     doc.text(`Həftə: ${getWeekStart()}`, 20, 30);
-//     doc.setTextColor(0);
-
-//     let y = 45;
-
-//     const days = dayKey
-//       ? mealPlan.days?.filter((d) => d.dayOfWeek === dayKey)
-//       : mealPlan.days;
-
-//     days?.forEach((day) => {
-//       // Gün başlığı
-//       doc.setFontSize(13);
-//       doc.setTextColor(34, 197, 94);
-//       doc.text(day.dayOfWeek, 20, y);
-//       doc.setTextColor(0);
-//       y += 8;
-
-//       // Xətt
-//       doc.setDrawColor(200);
-//       doc.line(20, y, 190, y);
-//       y += 6;
-
-//       day.meals?.forEach((meal) => {
-//         doc.setFontSize(11);
-//         doc.setTextColor(100);
-//         doc.text(meal.mealType, 22, y);         // Breakfast / Lunch / Dinner
-//         doc.setTextColor(0);
-//         doc.text(meal.title, 60, y);             // Yemək adı
-//         doc.setTextColor(120);
-//         doc.text(meal.time || "", 160, y);       // Saat
-//         doc.setTextColor(0);
-//         y += 8;
-//       });
-
-//       y += 6;
-//       if (y > 270) { doc.addPage(); y = 20; }
-//     });
-
-//     doc.save(dayKey ? `meal-plan-${dayKey}.pdf` : "meal-plan-weekly.pdf");
-
-//   } catch (err) {
-//     console.error("PDF export error:", err);
-//     alert("PDF yaradılmadı. Yenidən cəhd edin.");
-//   }
-// };
-// const handleExportShoppingList = async (dayKey = null) => {
-//   if (!shoppingList?.id) return alert("Siyahı mövcud deyil");
-//   try {
-//     const url = `${API_BASE_URL}/shopping-lists/${shoppingList.id}/export?format=pdf${dayKey ? `&day=${dayKey}` : ""}`;
-//     const res = await fetch(url, {
-//       headers: { Authorization: `Bearer ${getToken()}` },
-//     });
-//     if (!res.ok) throw new Error("İxrac uğursuz oldu");
-
-//     const blob = await res.blob();
-//     const objectUrl = window.URL.createObjectURL(blob);
-//     const a = document.createElement("a");
-//     a.href = objectUrl;
-//     a.download = dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf";
-//     a.click();
-//     window.URL.revokeObjectURL(objectUrl);
-//   } catch (err) {
-//     console.error("EXPORT SHOPPING LIST ERROR:", err);
-//     alert(err.message);
-//   }
-// };
-//   const handleExportMealPlan = async (dayKey = null) => {
-//   if (!mealPlan) return alert("Plan mövcud deyil");
-
-//   try {
-// // const fontUrl = "https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit/examples/fonts/DejaVuSans.ttf";
-// //     const fontBytes = await fetch(fontUrl).then(r => r.arrayBuffer());
-// //     const fontBase64 = arrayBufferToBase64(fontBytes);
-
-// //     const doc = new jsPDF({ putOnlyUsedFonts: true, compress: true });
-
-// //     doc.addFileToVFS("Roboto-Regular.ttf", fontBase64);
-// //     doc.addFont("Roboto-Regular.ttf", "Roboto", "normal"); 
-// //     doc.setFont("Roboto", "normal");
-// // Noto Sans - tam Unicode dəstəyi
-//     const fontUrl = "https://fonts.gstatic.com/s/notosans/v36/o-0IIpQlx3QUlC5A4PNjXhFVadyB1Wk.woff2";
-    
-//     const fontBytes = await fetch(fontUrl).then(r => r.arrayBuffer());
-//     const fontBase64 = arrayBufferToBase64(fontBytes);
-
-//     const doc = new jsPDF({ putOnlyUsedFonts: true, compress: true });
-
-//     doc.addFileToVFS("NotoSans.ttf", fontBase64);
-//     doc.addFont("NotoSans.ttf", "NotoSans", "normal");
-//     doc.setFont("NotoSans", "normal");
-//     // Başlıq
-//     doc.setFontSize(18);
-//     doc.text("Qidalanma Plani", 20, 20);
-
-//     // Tarix
-//     doc.setFontSize(11);
-//     doc.setTextColor(150);
-//     doc.text(`Hefte: ${getWeekStart()}`, 20, 30);
-//     doc.setTextColor(0);
-
-//     let y = 45;
-
-//     const days = dayKey
-//       ? mealPlan.days?.filter((d) => d.dayOfWeek === dayKey)
-//       : mealPlan.days;
-
-//     days?.forEach((day) => {
-//       doc.setFontSize(13);
-//       doc.setTextColor(34, 197, 94);
-//       doc.text(day.dayOfWeek, 20, y);
-//       doc.setTextColor(0);
-//       y += 8;
-
-//       doc.setDrawColor(200);
-//       doc.line(20, y, 190, y);
-//       y += 6;
-
-//       day.meals?.forEach((meal) => {
-//         doc.setFontSize(11);
-//         doc.setTextColor(100);
-//         doc.text(meal.mealType, 22, y);
-//         doc.setTextColor(0);
-//         doc.text(meal.title, 60, y);
-//         doc.setTextColor(120);
-//         doc.text(meal.time || "", 160, y);
-//         doc.setTextColor(0);
-//         y += 8;
-//       });
-
-//       y += 6;
-//       if (y > 270) { doc.addPage(); y = 20; }
-//     });
-
-//     doc.save(dayKey ? `meal-plan-${dayKey}.pdf` : "meal-plan-weekly.pdf");
-
-//   } catch (err) {
-//     console.error("PDF export error:", err);
-//     alert("PDF yaradilmadi. Yeniden cehd edin.");
-//   }
-// };
 const handleExportMealPlan = async (dayKey = null) => {
   if (!mealPlan) return alert("Plan mövcud deyil");
 
@@ -844,82 +705,310 @@ const handleExportMealPlan = async (dayKey = null) => {
       if (y > 270) { doc.addPage(); y = 20; }
     });
 
-    doc.save(dayKey ? `meal-plan-${dayKey}.pdf` : "meal-plan-weekly.pdf");
-
+    // doc.save(dayKey ? `meal-plan-${dayKey}.pdf` : "meal-plan-weekly.pdf");
+// doc.save(...) əvəzinə:
+const pdfBlob = doc.output("blob");
+const url = URL.createObjectURL(pdfBlob);
+const link = document.createElement("a");
+link.href = url;
+link.download = dayKey ? `meal-plan-${dayKey}.pdf` : "meal-plan-weekly.pdf";
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (err) {
     console.error("PDF export error:", err);
     alert("PDF yaradılmadı. Yenidən cəhd edin.");
   }
 };
 
+
+// const handleExportShoppingList = async (dayKey = null) => {
+//   if (!shoppingList) return alert("Siyahı mövcud deyil");
+
+//   try {
+//     const fontBytes = await fetch(NotoSansFont).then(r => r.arrayBuffer());
+//     const fontBase64 = arrayBufferToBase64(fontBytes);
+
+//     const doc = new jsPDF({ putOnlyUsedFonts: true, compress: true });
+//     doc.addFileToVFS("NotoSans.ttf", fontBase64);
+//     doc.addFont("NotoSans.ttf", "NotoSans", "normal");
+//     doc.setFont("NotoSans", "normal");
+
+//     // dayKey meal adıdırsa (Breakfast/Lunch/Dinner) backend dəstəkləmir
+//     // yalnız gün və ya həftəlik fetch edə bilərik
+//     const MEAL_KEYS = ["Breakfast", "Lunch", "Dinner"];
+//     const DAY_KEYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+//     // Export üçün backend-dən fresh data çək
+//     // let exportData = shoppingList; // default: mövcud data (həftəlik)
+
+//     // if (dayKey && DAY_KEYS.includes(dayKey)) {
+//     //   // Günlük: backend-dən həmin günün datasını çək
+//     //   const weekStart = getWeekStart();
+//     //   const res = await fetch(
+//     //     `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}&dayOfWeek=${dayKey}`,
+//     //     { headers: { Authorization: `Bearer ${getToken()}` } }
+//     //   );
+//     //   if (res.ok) exportData = await res.json();
+//     // }
+//     // Meal filter üçün backend dəstəkləmirsə — mövcud data istifadə olunur
+// // Export üçün backend-dən fresh data çək
+// let exportData = shoppingList;
+// const weekStart = getWeekStart();
+
+// if (!dayKey) {
+//   // ✅ Həftəlik: dayOfWeek olmadan fetch et
+//   const res = await fetch(
+//     `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}`,
+//     { headers: { Authorization: `Bearer ${getToken()}` } }
+//   );
+//   if (res.ok) exportData = await res.json();
+// } else if (DAY_KEYS.includes(dayKey)) {
+//   // Günlük: həmin günün datasını çək
+//   const res = await fetch(
+//     `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}&dayOfWeek=${dayKey}`,
+//     { headers: { Authorization: `Bearer ${getToken()}` } }
+//   );
+//   if (res.ok) exportData = await res.json();
+// }
+// // MEAL_KEYS üçün mövcud data istifadə olunur (backend dəstəkləmir)
+//     const categories = exportData?.categories || [];
+
+//     // Label hazırla
+//     const MEAL_LABELS = { Breakfast: "Seher Yemeyи", Lunch: "Nahar", Dinner: "Sam Yemeyи" };
+//     const DAY_LABELS = { Mon: "Bazar ertesi", Tue: "Cersenbe axsami", Wed: "Cersенbe", Thu: "Cumа axsami", Fri: "Cumа", Sat: "Senbe", Sun: "Bazar" };
+
+//     doc.setFontSize(18);
+//     doc.text("Alis-veris Siyahisi", 20, 20);
+
+//     doc.setFontSize(11);
+//     doc.setTextColor(150);
+//     doc.text(`Hefte: ${getWeekStart()}`, 20, 30);
+//     if (dayKey && DAY_KEYS.includes(dayKey)) doc.text(`Gun: ${DAY_LABELS[dayKey] || dayKey}`, 20, 38);
+//     if (dayKey && MEAL_KEYS.includes(dayKey)) doc.text(`Yemek: ${MEAL_LABELS[dayKey] || dayKey}`, 20, 38);
+//     doc.setTextColor(0);
+
+//     let y = dayKey ? 50 : 45;
+
+//     if (categories.length === 0) {
+//       doc.setDrawColor(200);
+//       doc.line(20, y, 190, y);
+//       y += 8;
+//       doc.setFontSize(12);
+//       doc.setTextColor(150);
+//       doc.text("Siyahi boshdur.", 20, y);
+//     } else {
+//       categories.forEach((cat) => {
+//         doc.setFontSize(13);
+//         doc.setTextColor(59, 130, 246);
+//         doc.text(cat.name || "", 20, y);
+//         doc.setTextColor(0);
+//         y += 6;
+//         doc.setDrawColor(200);
+//         doc.line(20, y, 190, y);
+//         y += 6;
+
+//         (cat.items || []).forEach((item) => {
+//           doc.setFontSize(11);
+//           doc.setTextColor(item.checked ? 150 : 0);
+//           doc.text(item.checked ? "v" : "o", 20, y);
+//           doc.text(item.name || "", 30, y);
+//           if (item.quantity) {
+//             doc.setTextColor(120);
+//             doc.text(`${item.quantity}`, 160, y);
+//           }
+//           doc.setTextColor(0);
+//           y += 8;
+//           if (y > 270) { doc.addPage(); y = 20; }
+//         });
+//         y += 4;
+//       });
+//     }
+
+//     const pdfBlob = doc.output("blob");
+//     const url = URL.createObjectURL(pdfBlob);
+//     const link = document.createElement("a");
+//     link.href = url;
+//     link.download = dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf";
+//     document.body.appendChild(link);
+//     link.click();
+//     document.body.removeChild(link);
+//     setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+//   } catch (err) {
+//     console.error("PDF export error:", err);
+//     alert("PDF yaradilmadi. Yeniden cehd edin.");
+//   }
+// };
 const handleExportShoppingList = async (dayKey = null) => {
   if (!shoppingList) return alert("Siyahı mövcud deyil");
 
-  const doc = new jsPDF();
-
   try {
-    // Font yüklə
-    const fontUrl = "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/fonts/Roboto/Roboto-Regular.ttf";
-    
-    const fontBytes = await fetch(fontUrl).then(r => r.arrayBuffer());
-   const fontBase64 = arrayBufferToBase64(fontBytes);
-    doc.addFileToVFS("Roboto.ttf", fontBase64);
-    doc.addFont("Roboto.ttf", "Roboto", "normal");
-    doc.setFont("Roboto");
+    const fontBytes = await fetch(NotoSansFont).then(r => r.arrayBuffer());
+    const fontBase64 = arrayBufferToBase64(fontBytes);
 
-    // Başlıq
+    const doc = new jsPDF({ putOnlyUsedFonts: true, compress: true });
+    doc.addFileToVFS("NotoSans.ttf", fontBase64);
+    doc.addFont("NotoSans.ttf", "NotoSans", "normal");
+    doc.setFont("NotoSans", "normal");
+
+    const MEAL_KEYS = ["Breakfast", "Lunch", "Dinner"];
+    const DAY_KEYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const weekStart = getWeekStart();
+
     doc.setFontSize(18);
-    doc.text("Alış-veriş Siyahısı", 20, 20);
-
-    // Tarix
+    doc.text("Alis-veris Siyahisi", 20, 20);
     doc.setFontSize(11);
     doc.setTextColor(150);
-    doc.text(`Həftə: ${getWeekStart()}`, 20, 30);
-    if (dayKey) doc.text(`Gün: ${dayKey}`, 20, 38);
+    doc.text(`Hefte: ${weekStart}`, 20, 30);
     doc.setTextColor(0);
 
-    let y = dayKey ? 50 : 45;
+    let y = 45;
 
-    // Xətt
-    doc.setDrawColor(200);
-    doc.line(20, y, 190, y);
-    y += 8;
+    if (!dayKey) {
+      // ✅ HƏFTƏLİK: hər günü ayrıca fetch et və günə görə göstər
+      for (const day of DAY_KEYS) {
+        const res = await fetch(
+          `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}&dayOfWeek=${day}`,
+          { headers: { Authorization: `Bearer ${getToken()}` } }
+        );
+        if (!res.ok) continue;
+        const dayData = await res.json();
+        const categories = dayData?.categories || [];
+        const allItems = categories.flatMap(c => c.items || []);
+        if (allItems.length === 0) continue;
 
-    const items = shoppingList?.items || [];
-
-    if (items.length === 0) {
-      doc.setFontSize(12);
-      doc.setTextColor(150);
-      doc.text("Siyahı boşdur.", 20, y);
-    } else {
-      items.forEach((item, index) => {
-        doc.setFontSize(11);
-
-        // Checkbox işarəsi
-        doc.setTextColor(item.checked ? 150 : 0);
-        doc.text(item.checked ? "✓" : "○", 20, y);
-
-        // Məhsul adı
-        doc.text(`${item.name}`, 30, y);
-
-        // Miqdar
-        if (item.quantity) {
-          doc.setTextColor(120);
-          doc.text(`${item.quantity}`, 160, y);
-        }
-
+        // Gün başlığı (Meal Plan-dakı kimi)
+        if (y > 250) { doc.addPage(); y = 20; }
+        doc.setFontSize(14);
+        doc.setTextColor(34, 197, 94); // yaşıl
+        doc.text(day, 20, y);
         doc.setTextColor(0);
-        y += 8;
+        y += 6;
+        doc.setDrawColor(200);
+        doc.line(20, y, 190, y);
+        y += 6;
 
-        if (y > 270) { doc.addPage(); y = 20; }
+        categories.forEach((cat) => {
+          if (!cat.items?.length) return;
+
+          doc.setFontSize(11);
+          doc.setTextColor(59, 130, 246); // mavi
+          doc.text(cat.name || "", 22, y);
+          doc.setTextColor(0);
+          y += 7;
+
+          cat.items.forEach((item) => {
+            doc.setFontSize(10);
+            doc.setTextColor(item.checked ? 150 : 0);
+            doc.text(item.checked ? "v" : "o", 24, y);
+            doc.text(item.name || "", 32, y);
+            if (item.quantity) {
+              doc.setTextColor(120);
+              doc.text(`${item.quantity}`, 160, y);
+            }
+            doc.setTextColor(0);
+            y += 7;
+            if (y > 270) { doc.addPage(); y = 20; }
+          });
+          y += 2;
+        });
+        y += 6;
+      }
+
+    } else if (DAY_KEYS.includes(dayKey)) {
+      // Günlük export
+      const res = await fetch(
+        `${API_BASE_URL}/shopping-lists?weekStart=${weekStart}&dayOfWeek=${dayKey}`,
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      const exportData = res.ok ? await res.json() : shoppingList;
+      const categories = exportData?.categories || [];
+
+      doc.setFontSize(14);
+      doc.setTextColor(34, 197, 94);
+      doc.text(dayKey, 20, y);
+      doc.setTextColor(0);
+      y += 6;
+      doc.setDrawColor(200);
+      doc.line(20, y, 190, y);
+      y += 6;
+
+      categories.forEach((cat) => {
+        if (!cat.items?.length) return;
+        doc.setFontSize(11);
+        doc.setTextColor(59, 130, 246);
+        doc.text(cat.name || "", 22, y);
+        doc.setTextColor(0);
+        y += 7;
+
+        cat.items.forEach((item) => {
+          doc.setFontSize(10);
+          doc.setTextColor(item.checked ? 150 : 0);
+          doc.text(item.checked ? "v" : "o", 24, y);
+          doc.text(item.name || "", 32, y);
+          if (item.quantity) {
+            doc.setTextColor(120);
+            doc.text(`${item.quantity}`, 160, y);
+          }
+          doc.setTextColor(0);
+          y += 7;
+          if (y > 270) { doc.addPage(); y = 20; }
+        });
+        y += 2;
+      });
+
+    } else if (MEAL_KEYS.includes(dayKey)) {
+      // Meal filter - mövcud data
+      const categories = shoppingList?.categories || [];
+      doc.setFontSize(11);
+      doc.setTextColor(150);
+      doc.text(`Yemek: ${dayKey}`, 20, 38);
+      doc.setTextColor(0);
+      y = 50;
+
+      categories.forEach((cat) => {
+        if (!cat.items?.length) return;
+        doc.setFontSize(11);
+        doc.setTextColor(59, 130, 246);
+        doc.text(cat.name || "", 20, y);
+        doc.setTextColor(0);
+        y += 6;
+        doc.setDrawColor(200);
+        doc.line(20, y, 190, y);
+        y += 6;
+
+        cat.items.forEach((item) => {
+          doc.setFontSize(10);
+          doc.setTextColor(item.checked ? 150 : 0);
+          doc.text(item.checked ? "v" : "o", 20, y);
+          doc.text(item.name || "", 30, y);
+          if (item.quantity) {
+            doc.setTextColor(120);
+            doc.text(`${item.quantity}`, 160, y);
+          }
+          doc.setTextColor(0);
+          y += 7;
+          if (y > 270) { doc.addPage(); y = 20; }
+        });
+        y += 4;
       });
     }
 
-    doc.save(dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf");
+    const pdfBlob = doc.output("blob");
+    const url = URL.createObjectURL(pdfBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = dayKey ? `shopping-${dayKey}.pdf` : "shopping-weekly.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 
   } catch (err) {
     console.error("PDF export error:", err);
-    alert("PDF yaradılmadı. Yenidən cəhd edin.");
+    alert("PDF yaradilmadi. Yeniden cehd edin.");
   }
 };
 const handleEditClick = (day) => {
