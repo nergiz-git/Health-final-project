@@ -272,7 +272,7 @@ const currentDayLabel  = DAYS.find((d) => d.key === currentDay)?.label || "";
 
 
   return (
-    <div className="!bg-white !rounded-3xl !shadow-xl mt-12 overflow-hidden">
+    <div className="!bg-white !rounded-3xl !shadow-xl mt-12 overflow-hidden max-w-[96vw]">
 
       {/* HEADER */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-5 sm:p-6 border-b border-slate-100">

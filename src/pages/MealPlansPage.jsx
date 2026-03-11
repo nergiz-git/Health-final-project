@@ -1034,7 +1034,9 @@ const handleEditClick = (day) => {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto py-6 sm:py-10 relative">
+    // <div className="max-w-[1600px] mx-auto py-6 sm:py-10 relative">
+    // <div className="w-full max-w-[1600px] mx-auto py-6 sm:py-10 relative px-3 sm:px-6">
+    <div className="w-full mx-auto py-4 sm:py-10 ">
       <div className="relative z-10">
 
         <motion.div

@@ -55,12 +55,17 @@ function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating,
       initial={{ y: 30, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
-      className="!bg-white !backdrop-blur-xl rounded-3xl !shadow-xl overflow-hidden"
+      // className="!bg-white !backdrop-blur-xl rounded-3xl !shadow-xl overflow-hidden"
+      className="!bg-white !backdrop-blur-xl rounded-xl sm:rounded-3xl !shadow-xl overflow-hidden overflow-hidden max-w-[96vw]"
     >
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 p-5 sm:p-8 bg-gradient-to-r from-emerald-50 to-slate-100">
+      {/* <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 p-5 sm:p-8 bg-gradient-to-r from-emerald-50 to-slate-100"> */}
+      {/* <div className="flex flex-col gap-4 p-5 sm:p-8 bg-gradient-to-r from-emerald-50 to-slate-100"> */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-3 sm:p-8 bg-gradient-to-r from-emerald-50 to-slate-100">
         <div className="flex gap-4 items-center">
-          <div className="!bg-emerald-500 text-white p-4 rounded-2xl !shadow-lg">
+          {/* <div className="!bg-emerald-500 text-white p-4 rounded-2xl !shadow-lg"> */}
+          <div className="!bg-emerald-500 text-white p-3 rounded-2xl !shadow-lg">
+
             <UtensilsCrossed size={20} />
           </div>
           <div>
@@ -73,7 +78,7 @@ function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating,
         <button
           onClick={onGenerate}
           disabled={generating}
-          className="!bg-emerald-500 hover:!bg-emerald-600 text-white px-6 py-3 rounded-xl !shadow-lg flex items-center gap-2 disabled:opacity-60"
+          className="w-full !bg-emerald-500 sm:w-auto hover:!bg-emerald-600 text-white px-6 py-3 rounded-xl !shadow-lg flex items-center justify-center gap-2 disabled:opacity-60"
         >
           {generating ? (
             <>
@@ -90,7 +95,9 @@ function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating,
       </div>
 
       {/* DAY TABS */}
-      <div className="p-8 pb-2">
+      {/* <div className="p-8 pb-2"> */}
+        {/* <div className="p-3 sm:p-8 pb-2"> */}
+        <div className="px-2 py-2 sm:p-8 pb-2">
         <div className="bg-slate-100 rounded-lg p-1 flex overflow-x-auto no-scrollbar">
           {days.map((d) => (
             <button
@@ -98,7 +105,7 @@ function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating,
               // onClick={() => setSelectedDay(d.key)}
               onClick={() => handleDayChange(d.key)}
 
-              className={`flex-1 !py-2 !rounded-lg !text-sm !font-medium !transition
+              className={`flex-1 !py-1.5 !rounded-lg !text-xs sm:!text-sm !font-medium !transition
                 ${selectedDay === d.key
                   ? "!bg-white !shadow !text-emerald-600"
                   : "!text-slate-500"}`}
@@ -110,26 +117,27 @@ function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating,
       </div>
 
       {/* MEALS */}
-      <div className="p-8 space-y-6">
+      {/* <div className="p-8 space-y-6"> */}
+      <div className="p-3 sm:p-8 space-y-4 sm:space-y-6">
         {/* BREAKFAST */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-orange-50 border border-orange-200 rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl p-4 sm:p-6">
           <div>
-            <p className="font-semibold text-orange-600 mb-1">Səhər Yeməyi</p>
+            <p className="font-semibold text-emerald-600 mb-1 text-sm sm:text-base">Səhər Yeməyi</p>
             <p className="text-slate-700">{breakfast?.title || "-"}</p>
           </div>
-          <div className="flex items-center gap-2 text-orange-600">
+          <div className="flex items-center gap-2 text-emerald-600">
             <Clock size={18} />
             <span>{breakfast?.time || "07:00 AM"}</span>
           </div>
         </div>
 
         {/* LUNCH */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-orange-50 border border-orange-200 rounded-2xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl p-4 sm:p-6">
           <div>
-            <p className="font-semibold text-orange-600 mb-1">Nahar</p>
+            <p className="font-semibold text-emerald-600 mb-1 text-sm sm:text-base">Nahar</p>
             <p className="text-slate-700">{lunch?.title || "-"}</p>
           </div>
-          <div className="flex items-center gap-2 text-orange-600">
+          <div className="flex items-center gap-2 text-emerald-600">
             <Clock size={18} />
             <span>{lunch?.time || "12:30 PM"}</span>
           </div>
@@ -138,7 +146,7 @@ function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating,
         {/* DINNER */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl p-4 sm:p-6">
           <div>
-            <p className="font-semibold text-emerald-600 mb-1">Şam Yeməyi</p>
+            <p className="font-semibold text-emerald-600 mb-1 text-sm sm:text-base">Şam Yeməyi</p>
             <p className="text-slate-700">{dinner?.title || "-"}</p>
           </div>
           <div className="flex items-center gap-2 text-emerald-600">
@@ -149,7 +157,9 @@ function MealPlanCard({ mealPlan, onEditClick, onGenerate, onExport, generating,
       </div>
 
       {/* ACTION BUTTONS */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-center pb-6 sm:pb-8 px-6">
+      {/* <div className="flex flex-col sm:flex-row gap-3 justify-center pb-6 sm:pb-8 px-6"> */}
+      {/* <div className="flex flex-col gap-3 justify-center pb-4 sm:pb-8 px-3 sm:px-6"> */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pb-4 sm:pb-8 px-3 sm:px-6">
         {/* Edit current day — PUT /meal-plans/{id} */}
         <button
           onClick={() => onEditClick(selectedDay)}

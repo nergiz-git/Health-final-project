@@ -280,17 +280,25 @@ import { Pill, UtensilsCrossed, Dumbbell, Clock, CheckCircle2, Loader2 } from 'l
 import medicalBackground from '../assets/images/DashboardPage.png';
 import { motion } from 'framer-motion';
 import MainContext from './context/context';
+import {  useLocation } from 'react-router-dom';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function DashboardPage() {
+  const location = useLocation();
   const { user } = useOutletContext();
   const [todaySchedule, setTodaySchedule] = useState(null);
   const [loading, setLoading] = useState(true);
   let { theme } = useContext(MainContext)
   // ✅ Fetch today's schedule from backend
-  useEffect(() => {
-    fetchTodaySchedule();
-  }, []);
+  // useEffect(() => {
+  //   fetchTodaySchedule();
+  // }, []);
+
+
+
+useEffect(() => {
+  fetchTodaySchedule();
+}, [location.pathname]);
 
   const fetchTodaySchedule = async () => {
     try {
@@ -310,6 +318,7 @@ function DashboardPage() {
         }
       });
       const data = await res.json().catch(() => ({}));  // json parsing üçün
+      console.log('TODAY SCHEDULE DATA:', data); // ← nə gəldiyini görün
 
       if (res.ok) {
         setTodaySchedule(data);

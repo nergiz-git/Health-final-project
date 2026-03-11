@@ -232,7 +232,8 @@ function Layout({ user, onLogout, onUpdateUser }) {
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    // <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden ">
 
       {/* Background */}
       <div
@@ -285,8 +286,10 @@ function Layout({ user, onLogout, onUpdateUser }) {
         <Header user={user} onLogout={onLogout} />
          <ThemeToggle />
 
-        <main className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
-          <div className="max-w-[1480px] 2xl:max-w-[1620px] w-full mx-auto">
+        {/* <main className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 py-6">
+          <div className="max-w-[1480px] 2xl:max-w-[1620px] w-full mx-auto px-2 sm:px-0"> */}
+          <main className="flex-1 overflow-y-auto overflow-hidden py-6">
+  <div className="w-full max-w-[1480px] 2xl:max-w-[1620px] mx-auto px-2 sm:px-4 md:px-6">
             <Outlet context={{ user }} />
           </div>
         </main>
